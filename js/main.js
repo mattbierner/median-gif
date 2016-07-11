@@ -30220,9 +30220,8 @@
 	    _createClass(GifRenderer, [{
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
-	            this._container = _reactDom2.default.findDOMNode(this);
-	            this._canvas = this._container.getElementsByClassName('gif-canvas')[0];
-	            this._renderer = new _median_renderer2.default(this._canvas, this._container);
+	            this._canvas = _reactDom2.default.findDOMNode(this);
+	            this._renderer = new _median_renderer2.default(this._canvas);
 
 	            this.drawGifForOptions(this.props.imageData);
 	        }
@@ -30246,11 +30245,9 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement(
-	                'div',
-	                null,
-	                _react2.default.createElement('canvas', { className: 'gif-canvas', width: '100', height: '100' })
-	            );
+	            return _react2.default.createElement('canvas', { className: 'gif-canvas',
+	                width: this.props.imageData ? this.props.imageData.width : 100,
+	                height: this.props.imageData ? this.props.imageData.height : 100 });
 	        }
 	    }]);
 
@@ -35253,8 +35250,6 @@
 	    value: true
 	});
 
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _three = __webpack_require__(214);
@@ -35278,12 +35273,10 @@
 	var emptyTexture = new _three2.default.Texture();
 
 	var MedianRenderer = function () {
-	    function MedianRenderer(canvas, container) {
+	    function MedianRenderer(canvas) {
 	        _classCallCheck(this, MedianRenderer);
 
 	        this._frames = [];
-
-	        this.container = container;
 
 	        this.mouse = null;
 
@@ -35293,7 +35286,7 @@
 	        this._sceneRTT = new _three2.default.Scene();
 
 	        this.initRenderer(canvas);
-	        this.initCamera();
+	        this.resize(100, 100);
 
 	        this.initGeometry();
 
@@ -35302,12 +35295,6 @@
 	    }
 
 	    _createClass(MedianRenderer, [{
-	        key: '_getViewportSize',
-	        value: function _getViewportSize() {
-	            var rect = this.container.getBoundingClientRect();
-	            return [rect.width, rect.height];
-	        }
-	    }, {
 	        key: 'initRenderer',
 	        value: function initRenderer(canvas) {
 	            this._renderer = new _three2.default.WebGLRenderer({
@@ -35315,32 +35302,6 @@
 	            });
 	            this._renderer.setClearColor(0xffffff, 0);
 	            this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
-	        }
-	    }, {
-	        key: 'initCamera',
-	        value: function initCamera() {
-	            var _getViewportSize2 = this._getViewportSize();
-
-	            var _getViewportSize3 = _slicedToArray(_getViewportSize2, 2);
-
-	            var viewWidth = _getViewportSize3[0];
-	            var viewHeight = _getViewportSize3[1];
-
-
-	            this._camera = new _three2.default.OrthographicCamera(-viewWidth / 2, viewWidth / 2, viewHeight / 2, -viewHeight / 2, -10000, 10000);
-	            this._camera.position.z = 100;
-
-	            this._rtTexture1 = new _three2.default.WebGLRenderTarget(viewWidth, viewHeight, {
-	                minFilter: _three2.default.LinearFilter,
-	                magFilter: _three2.default.NearestFilter,
-	                format: _three2.default.RGBFormat
-	            });
-
-	            this._rtTexture2 = new _three2.default.WebGLRenderTarget(viewWidth, viewHeight, {
-	                minFilter: _three2.default.LinearFilter,
-	                magFilter: _three2.default.NearestFilter,
-	                format: _three2.default.RGBFormat
-	            });
 	        }
 	    }, {
 	        key: 'initGeometry',
@@ -35387,6 +35348,9 @@
 	            this._material.uniforms.frameWeight.value = 1.0 / imageData.frames.length;
 	            this._material.uniforms.frameWeight.needsUpdate = true;
 
+	            this.resize(imageData.width, imageData.height);
+
+	            this.setOptions(options);
 	            this.setCurrentFrame(0);
 	        }
 	    }, {
@@ -35398,6 +35362,26 @@
 	    }, {
 	        key: 'setOptions',
 	        value: function setOptions(options) {}
+	    }, {
+	        key: 'resize',
+	        value: function resize(width, height) {
+	            this._camera = new _three2.default.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -10000, 10000);
+	            this._camera.position.z = 100;
+
+	            this._rtTexture1 = new _three2.default.WebGLRenderTarget(width, height, {
+	                minFilter: _three2.default.LinearFilter,
+	                magFilter: _three2.default.NearestFilter,
+	                format: _three2.default.RGBFormat
+	            });
+
+	            this._rtTexture2 = new _three2.default.WebGLRenderTarget(width, height, {
+	                minFilter: _three2.default.LinearFilter,
+	                magFilter: _three2.default.NearestFilter,
+	                format: _three2.default.RGBFormat
+	            });
+
+	            this._renderer.setSize(width, height);
+	        }
 
 	        /**
 	         * Main update function.

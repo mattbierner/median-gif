@@ -8,9 +8,8 @@ import MedianRenderer from './median_renderer';
  */
 export default class GifRenderer extends React.Component {
     componentDidMount() {
-        this._container = ReactDOM.findDOMNode(this);
-        this._canvas = this._container.getElementsByClassName('gif-canvas')[0];
-        this._renderer = new MedianRenderer(this._canvas, this._container);
+        this._canvas = ReactDOM.findDOMNode(this);
+        this._renderer = new MedianRenderer(this._canvas);
 
         this.drawGifForOptions(this.props.imageData);
     }
@@ -32,9 +31,9 @@ export default class GifRenderer extends React.Component {
 
     render() {
         return (
-            <div>
-                <canvas className="gif-canvas" width="100" height="100" />
-            </div>
+            <canvas className="gif-canvas"
+                width={this.props.imageData ? this.props.imageData.width : 100}
+                height={this.props.imageData ? this.props.imageData.height : 100}  />
         );
     }
 };

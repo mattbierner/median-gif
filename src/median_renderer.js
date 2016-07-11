@@ -7,10 +7,8 @@ import screen_shader from './shaders/screen';
 const emptyTexture = new THREE.Texture();
 
 export default class MedianRenderer {
-    constructor(canvas, container) {
+    constructor(canvas) {
         this._frames = [];
-
-        this.container = container;
 
         this.mouse = null;
 
@@ -20,17 +18,12 @@ export default class MedianRenderer {
         this._sceneRTT = new THREE.Scene();
 
         this.initRenderer(canvas);
-        this.initCamera();
+        this.resize(100, 100);
 
         this.initGeometry()
 
         //   new ResizeSensor(container, this.onWindowResize.bind(this));
         //   this.onWindowResize();
-    }
-
-    _getViewportSize() {
-        const rect = this.container.getBoundingClientRect();
-        return [rect.width, rect.height];
     }
 
     initRenderer(canvas) {
@@ -39,25 +32,6 @@ export default class MedianRenderer {
         });
         this._renderer.setClearColor(0xffffff, 0);
         this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
-    }
-
-    initCamera() {
-        const [viewWidth, viewHeight] = this._getViewportSize();
-
-        this._camera = new THREE.OrthographicCamera(-viewWidth / 2, viewWidth / 2, viewHeight / 2, -viewHeight / 2, -10000, 10000);
-        this._camera.position.z = 100;
-
-        this._rtTexture1 = new THREE.WebGLRenderTarget(viewWidth, viewHeight, {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.NearestFilter,
-            format: THREE.RGBFormat
-        });
-
-        this._rtTexture2 = new THREE.WebGLRenderTarget(viewWidth, viewHeight, {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.NearestFilter,
-            format: THREE.RGBFormat
-        });
     }
 
     initGeometry() {
@@ -81,6 +55,9 @@ export default class MedianRenderer {
         this._material.uniforms.frameWeight.value = 1.0 / (imageData.frames.length);
         this._material.uniforms.frameWeight.needsUpdate = true;
 
+        this.resize(imageData.width, imageData.height);
+
+        this.setOptions(options);
         this.setCurrentFrame(0);
     }
 
@@ -91,6 +68,25 @@ export default class MedianRenderer {
 
     setOptions(options) {
 
+    }
+
+    resize(width, height) {
+        this._camera = new THREE.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -10000, 10000);
+        this._camera.position.z = 100;
+
+        this._rtTexture1 = new THREE.WebGLRenderTarget(width, height, {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.NearestFilter,
+            format: THREE.RGBFormat
+        });
+
+        this._rtTexture2 = new THREE.WebGLRenderTarget(width, height, {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.NearestFilter,
+            format: THREE.RGBFormat
+        });
+
+        this._renderer.setSize(width, height);
     }
 
     /**
