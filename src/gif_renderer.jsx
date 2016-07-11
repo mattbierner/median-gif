@@ -4,29 +4,27 @@ import ReactDOM from 'react-dom';
 import MedianRenderer from './median_renderer';
 
 /**
- * Renders a median blended gif. 
+ * Renders a median blended gif.
  */
 export default class GifRenderer extends React.Component {
     componentDidMount() {
         this._canvas = ReactDOM.findDOMNode(this);
         this._renderer = new MedianRenderer(this._canvas);
-
-        this.drawGifForOptions(this.props.imageData);
+        
+        if (this.props.imageData) {
+            this._renderer.setGif(this.props.imageData, this.props);
+        }
     }
 
     componentWillReceiveProps(newProps) {
         if (this.props.imageData !== newProps.imageData) {
-            this.drawGifForOptions(newProps.imageData);
+            this._renderer.setGif(newProps.imageData);
         }
         if (this.props.currentFrame !== newProps.currentFrame) {
             this._renderer.setCurrentFrame(newProps.currentFrame);
         }
-    }
 
-    drawGifForOptions(imageData) {
-        if (imageData) {
-            this._renderer.setGif(imageData);
-        }
+        this._renderer.setOptions(newProps);
     }
 
     render() {

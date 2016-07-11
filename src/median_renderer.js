@@ -1,7 +1,7 @@
 import THREE from 'three';
 
-import default_shader from './shaders/main';
-import * as default_shader_config from './shaders/main';
+import median_shader from './shaders/median';
+import * as median_shader_config from './shaders/median';
 import screen_shader from './shaders/screen';
 
 const emptyTexture = new THREE.Texture();
@@ -9,10 +9,7 @@ const emptyTexture = new THREE.Texture();
 export default class MedianRenderer {
     constructor(canvas) {
         this._frames = [];
-
-        this.mouse = null;
-
-        this._clock = new THREE.Clock();
+        this._options = {};
 
         this._scene = new THREE.Scene();
         this._sceneRTT = new THREE.Scene();
@@ -21,9 +18,6 @@ export default class MedianRenderer {
         this.resize(100, 100);
 
         this.initGeometry()
-
-        //   new ResizeSensor(container, this.onWindowResize.bind(this));
-        //   this.onWindowResize();
     }
 
     initRenderer(canvas) {
@@ -37,7 +31,7 @@ export default class MedianRenderer {
     initGeometry() {
         const plane = new THREE.PlaneGeometry(2, 2);
 
-        this._material = new THREE.ShaderMaterial(default_shader);
+        this._material = new THREE.ShaderMaterial(median_shader);
         this._sceneRTT.add(new THREE.Mesh(plane, this._material));
 
         this._materialScreen = new THREE.ShaderMaterial(screen_shader);
@@ -57,7 +51,9 @@ export default class MedianRenderer {
 
         this.resize(imageData.width, imageData.height);
 
-        this.setOptions(options);
+        if (options) {
+           this.setOptions(options);
+        }
         this.setCurrentFrame(0);
     }
 
@@ -67,7 +63,9 @@ export default class MedianRenderer {
     }
 
     setOptions(options) {
-
+        this._options = options;
+        console.log(options);
+        this.animate();
     }
 
     resize(width, height) {
@@ -92,23 +90,36 @@ export default class MedianRenderer {
     /**
      * Main update function.
      */
-    update(delta) {
+    update() {
        this._currentFrame++;
     }
 
     animate() {
-        const delta = this._clock.getDelta();
-        this.update(delta);
-        this.render(delta);
+        this.update();
+        this.render();
+    }
+
+    renderToScreen(source) {
+        this._materialScreen.uniforms.tDiffuse.value = source;
+        this._materialScreen.uniforms.tDiffuse.needsUpdate = true;
+
+        this._renderer.render(this._scene, this._camera);
     }
 
     render(delta) {
+        switch (this._options.mode) {
+        case 'median':
+            return this.renderToScreen(this.renderMedian());
+        }
+    }
+
+    renderMedian() {
         let source = emptyTexture;
         let dest = this._rtTexture1;
 
-        for (let startFrame = this._currentFrame; startFrame < this._frames.length; startFrame += default_shader_config.arraySize) {
+        for (let startFrame = this._currentFrame; startFrame < this._frames.length; startFrame += median_shader_config.arraySize) {
             const textures = [];
-            for (let i = startFrame; i < startFrame + default_shader_config.arraySize && i < this._frames.length; ++i) {
+            for (let i = startFrame; i < startFrame + median_shader_config.arraySize && i < this._frames.length; ++i) {
                 const tex = this._frames[i % this._frames.length];
                 textures.push(tex);
             }
@@ -123,10 +134,6 @@ export default class MedianRenderer {
             source = dest;
             dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1; 
         }
-
-        this._materialScreen.uniforms.tDiffuse.value = source;
-        this._materialScreen.uniforms.tDiffuse.needsUpdate = true;
-
-        this._renderer.render(this._scene, this._camera);
+        return source;
     }
 }

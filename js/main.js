@@ -28490,7 +28490,7 @@
 
 	var _gif_player2 = _interopRequireDefault(_gif_player);
 
-	var _gif_export = __webpack_require__(217);
+	var _gif_export = __webpack_require__(218);
 
 	var _gif_export2 = _interopRequireDefault(_gif_export);
 
@@ -30192,7 +30192,7 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _median_renderer = __webpack_require__(222);
+	var _median_renderer = __webpack_require__(214);
 
 	var _median_renderer2 = _interopRequireDefault(_median_renderer);
 
@@ -30205,7 +30205,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	/**
-	 * Renders a median blended gif. 
+	 * Renders a median blended gif.
 	 */
 
 	var GifRenderer = function (_React$Component) {
@@ -30223,24 +30223,21 @@
 	            this._canvas = _reactDom2.default.findDOMNode(this);
 	            this._renderer = new _median_renderer2.default(this._canvas);
 
-	            this.drawGifForOptions(this.props.imageData);
+	            if (this.props.imageData) {
+	                this._renderer.setGif(this.props.imageData, this.props);
+	            }
 	        }
 	    }, {
 	        key: 'componentWillReceiveProps',
 	        value: function componentWillReceiveProps(newProps) {
 	            if (this.props.imageData !== newProps.imageData) {
-	                this.drawGifForOptions(newProps.imageData);
+	                this._renderer.setGif(newProps.imageData);
 	            }
 	            if (this.props.currentFrame !== newProps.currentFrame) {
 	                this._renderer.setCurrentFrame(newProps.currentFrame);
 	            }
-	        }
-	    }, {
-	        key: 'drawGifForOptions',
-	        value: function drawGifForOptions(imageData) {
-	            if (imageData) {
-	                this._renderer.setGif(imageData);
-	            }
+
+	            this._renderer.setOptions(newProps);
 	        }
 	    }, {
 	        key: 'render',
@@ -30259,6 +30256,212 @@
 
 /***/ },
 /* 214 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _three = __webpack_require__(215);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	var _median = __webpack_require__(216);
+
+	var median_shader_config = _interopRequireWildcard(_median);
+
+	var _screen = __webpack_require__(217);
+
+	var _screen2 = _interopRequireDefault(_screen);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var emptyTexture = new _three2.default.Texture();
+
+	var MedianRenderer = function () {
+	    function MedianRenderer(canvas) {
+	        _classCallCheck(this, MedianRenderer);
+
+	        this._frames = [];
+	        this._options = {};
+
+	        this._scene = new _three2.default.Scene();
+	        this._sceneRTT = new _three2.default.Scene();
+
+	        this.initRenderer(canvas);
+	        this.resize(100, 100);
+
+	        this.initGeometry();
+	    }
+
+	    _createClass(MedianRenderer, [{
+	        key: 'initRenderer',
+	        value: function initRenderer(canvas) {
+	            this._renderer = new _three2.default.WebGLRenderer({
+	                canvas: canvas
+	            });
+	            this._renderer.setClearColor(0xffffff, 0);
+	            this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+	        }
+	    }, {
+	        key: 'initGeometry',
+	        value: function initGeometry() {
+	            var plane = new _three2.default.PlaneGeometry(2, 2);
+
+	            this._material = new _three2.default.ShaderMaterial(median_shader_config.default);
+	            this._sceneRTT.add(new _three2.default.Mesh(plane, this._material));
+
+	            this._materialScreen = new _three2.default.ShaderMaterial(_screen2.default);
+	            this._scene.add(new _three2.default.Mesh(plane, this._materialScreen));
+	        }
+	    }, {
+	        key: 'setGif',
+	        value: function setGif(imageData, options) {
+	            this._frames = [];
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
+	            try {
+	                for (var _iterator = imageData.frames[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var frame = _step.value;
+
+	                    var tex = new _three2.default.Texture(frame.canvas);
+	                    tex.needsUpdate = true;
+	                    this._frames.push(tex);
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+
+	            this._material.uniforms.frameWeight.value = 1.0 / imageData.frames.length;
+	            this._material.uniforms.frameWeight.needsUpdate = true;
+
+	            this.resize(imageData.width, imageData.height);
+
+	            if (options) {
+	                this.setOptions(options);
+	            }
+	            this.setCurrentFrame(0);
+	        }
+	    }, {
+	        key: 'setCurrentFrame',
+	        value: function setCurrentFrame(frame) {
+	            this._currentFrame = frame;
+	            this.animate();
+	        }
+	    }, {
+	        key: 'setOptions',
+	        value: function setOptions(options) {
+	            this._options = options;
+	            console.log(options);
+	            this.animate();
+	        }
+	    }, {
+	        key: 'resize',
+	        value: function resize(width, height) {
+	            this._camera = new _three2.default.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -10000, 10000);
+	            this._camera.position.z = 100;
+
+	            this._rtTexture1 = new _three2.default.WebGLRenderTarget(width, height, {
+	                minFilter: _three2.default.LinearFilter,
+	                magFilter: _three2.default.NearestFilter,
+	                format: _three2.default.RGBFormat
+	            });
+
+	            this._rtTexture2 = new _three2.default.WebGLRenderTarget(width, height, {
+	                minFilter: _three2.default.LinearFilter,
+	                magFilter: _three2.default.NearestFilter,
+	                format: _three2.default.RGBFormat
+	            });
+
+	            this._renderer.setSize(width, height);
+	        }
+
+	        /**
+	         * Main update function.
+	         */
+
+	    }, {
+	        key: 'update',
+	        value: function update() {
+	            this._currentFrame++;
+	        }
+	    }, {
+	        key: 'animate',
+	        value: function animate() {
+	            this.update();
+	            this.render();
+	        }
+	    }, {
+	        key: 'renderToScreen',
+	        value: function renderToScreen(source) {
+	            this._materialScreen.uniforms.tDiffuse.value = source;
+	            this._materialScreen.uniforms.tDiffuse.needsUpdate = true;
+
+	            this._renderer.render(this._scene, this._camera);
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render(delta) {
+	            switch (this._options.mode) {
+	                case 'median':
+	                    return this.renderToScreen(this.renderMedian());
+	            }
+	        }
+	    }, {
+	        key: 'renderMedian',
+	        value: function renderMedian() {
+	            var source = emptyTexture;
+	            var dest = this._rtTexture1;
+
+	            for (var startFrame = this._currentFrame; startFrame < this._frames.length; startFrame += median_shader_config.arraySize) {
+	                var textures = [];
+	                for (var i = startFrame; i < startFrame + median_shader_config.arraySize && i < this._frames.length; ++i) {
+	                    var tex = this._frames[i % this._frames.length];
+	                    textures.push(tex);
+	                }
+	                this._material.uniforms.frames.value = textures;
+	                this._material.uniforms.frames.needsUpdate = true;
+
+	                this._material.uniforms.sourceTexture.value = source;
+	                this._material.uniforms.sourceTexture.needsUpdate = true;
+
+	                this._renderer.render(this._sceneRTT, this._camera, dest, true);
+
+	                source = dest;
+	                dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1;
+	            }
+	            return source;
+	        }
+	    }]);
+
+	    return MedianRenderer;
+	}();
+
+	exports.default = MedianRenderer;
+
+/***/ },
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';// File:src/Three.js
@@ -33545,7 +33748,7 @@
 	var numFrames=this.geometry.morphTargets.length;var name="__default";var startFrame=0;var endFrame=numFrames-1;var fps=numFrames/1;this.createAnimation(name,startFrame,endFrame,fps);this.setAnimationWeight(name,1);};THREE.MorphBlendMesh.prototype=Object.create(THREE.Mesh.prototype);THREE.MorphBlendMesh.prototype.constructor=THREE.MorphBlendMesh;THREE.MorphBlendMesh.prototype.createAnimation=function(name,start,end,fps){var animation={start:start,end:end,length:end-start+1,fps:fps,duration:(end-start)/fps,lastFrame:0,currentFrame:0,active:false,time:0,direction:1,weight:1,directionBackwards:false,mirroredLoop:false};this.animationsMap[name]=animation;this.animationsList.push(animation);};THREE.MorphBlendMesh.prototype.autoCreateAnimations=function(fps){var pattern=/([a-z]+)_?(\d+)/i;var firstAnimation,frameRanges={};var geometry=this.geometry;for(var i=0,il=geometry.morphTargets.length;i<il;i++){var morph=geometry.morphTargets[i];var chunks=morph.name.match(pattern);if(chunks&&chunks.length>1){var name=chunks[1];if(!frameRanges[name])frameRanges[name]={start:Infinity,end:-Infinity};var range=frameRanges[name];if(i<range.start)range.start=i;if(i>range.end)range.end=i;if(!firstAnimation)firstAnimation=name;}}for(var name in frameRanges){var range=frameRanges[name];this.createAnimation(name,range.start,range.end,fps);}this.firstAnimation=firstAnimation;};THREE.MorphBlendMesh.prototype.setAnimationDirectionForward=function(name){var animation=this.animationsMap[name];if(animation){animation.direction=1;animation.directionBackwards=false;}};THREE.MorphBlendMesh.prototype.setAnimationDirectionBackward=function(name){var animation=this.animationsMap[name];if(animation){animation.direction=-1;animation.directionBackwards=true;}};THREE.MorphBlendMesh.prototype.setAnimationFPS=function(name,fps){var animation=this.animationsMap[name];if(animation){animation.fps=fps;animation.duration=(animation.end-animation.start)/animation.fps;}};THREE.MorphBlendMesh.prototype.setAnimationDuration=function(name,duration){var animation=this.animationsMap[name];if(animation){animation.duration=duration;animation.fps=(animation.end-animation.start)/animation.duration;}};THREE.MorphBlendMesh.prototype.setAnimationWeight=function(name,weight){var animation=this.animationsMap[name];if(animation){animation.weight=weight;}};THREE.MorphBlendMesh.prototype.setAnimationTime=function(name,time){var animation=this.animationsMap[name];if(animation){animation.time=time;}};THREE.MorphBlendMesh.prototype.getAnimationTime=function(name){var time=0;var animation=this.animationsMap[name];if(animation){time=animation.time;}return time;};THREE.MorphBlendMesh.prototype.getAnimationDuration=function(name){var duration=-1;var animation=this.animationsMap[name];if(animation){duration=animation.duration;}return duration;};THREE.MorphBlendMesh.prototype.playAnimation=function(name){var animation=this.animationsMap[name];if(animation){animation.time=0;animation.active=true;}else{console.warn("THREE.MorphBlendMesh: animation["+name+"] undefined in .playAnimation()");}};THREE.MorphBlendMesh.prototype.stopAnimation=function(name){var animation=this.animationsMap[name];if(animation){animation.active=false;}};THREE.MorphBlendMesh.prototype.update=function(delta){for(var i=0,il=this.animationsList.length;i<il;i++){var animation=this.animationsList[i];if(!animation.active)continue;var frameTime=animation.duration/animation.length;animation.time+=animation.direction*delta;if(animation.mirroredLoop){if(animation.time>animation.duration||animation.time<0){animation.direction*=-1;if(animation.time>animation.duration){animation.time=animation.duration;animation.directionBackwards=true;}if(animation.time<0){animation.time=0;animation.directionBackwards=false;}}}else{animation.time=animation.time%animation.duration;if(animation.time<0)animation.time+=animation.duration;}var keyframe=animation.start+THREE.Math.clamp(Math.floor(animation.time/frameTime),0,animation.length-1);var weight=animation.weight;if(keyframe!==animation.currentFrame){this.morphTargetInfluences[animation.lastFrame]=0;this.morphTargetInfluences[animation.currentFrame]=1*weight;this.morphTargetInfluences[keyframe]=0;animation.lastFrame=animation.currentFrame;animation.currentFrame=keyframe;}var mix=animation.time%frameTime/frameTime;if(animation.directionBackwards)mix=1-mix;if(animation.currentFrame!==animation.lastFrame){this.morphTargetInfluences[animation.currentFrame]=mix*weight;this.morphTargetInfluences[animation.lastFrame]=(1-mix)*weight;}else{this.morphTargetInfluences[animation.currentFrame]=weight;}}};
 
 /***/ },
-/* 215 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -33553,7 +33756,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var THREE = __webpack_require__(214);
+	var THREE = __webpack_require__(215);
 
 	var arraySize = exports.arraySize = 12;
 
@@ -33574,7 +33777,7 @@
 	};
 
 /***/ },
-/* 216 */
+/* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -33582,7 +33785,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var THREE = __webpack_require__(214);
+	var THREE = __webpack_require__(215);
 
 	exports.default = {
 	    uniforms: {
@@ -33593,7 +33796,7 @@
 	};
 
 /***/ },
-/* 217 */
+/* 218 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -33601,7 +33804,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var GifEncoder = __webpack_require__(218);
+	var GifEncoder = __webpack_require__(219);
 	//import * as scanline_renderer from './scanline_renderer';
 
 	/**
@@ -33640,7 +33843,7 @@
 	};
 
 /***/ },
-/* 218 */
+/* 219 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
@@ -33655,13 +33858,13 @@
 	  Todd Wolfson (Implemented streams - todd@twolfson.com)
 	*/
 
-	var assert = __webpack_require__(219);
+	var assert = __webpack_require__(220);
 	var EventEmitter = __webpack_require__(174).EventEmitter;
 	var ReadableStream = __webpack_require__(178);
 	var util = __webpack_require__(197);
 
-	var NeuQuant = __webpack_require__(220);
-	var LZWEncoder = __webpack_require__(221);
+	var NeuQuant = __webpack_require__(221);
+	var LZWEncoder = __webpack_require__(222);
 
 	// DEV: By using a capacitor, we prevent creating a data event for every byte written
 	function ByteCapacitor(options) {
@@ -34111,7 +34314,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(181).Buffer))
 
 /***/ },
-/* 219 */
+/* 220 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -34588,7 +34791,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 220 */
+/* 221 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -35021,7 +35224,7 @@
 	module.exports = NeuQuant;
 
 /***/ },
-/* 221 */
+/* 222 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -35239,201 +35442,6 @@
 	}
 
 	module.exports = LZWEncoder;
-
-/***/ },
-/* 222 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _three = __webpack_require__(214);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	var _main = __webpack_require__(215);
-
-	var default_shader_config = _interopRequireWildcard(_main);
-
-	var _screen = __webpack_require__(216);
-
-	var _screen2 = _interopRequireDefault(_screen);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var emptyTexture = new _three2.default.Texture();
-
-	var MedianRenderer = function () {
-	    function MedianRenderer(canvas) {
-	        _classCallCheck(this, MedianRenderer);
-
-	        this._frames = [];
-
-	        this.mouse = null;
-
-	        this._clock = new _three2.default.Clock();
-
-	        this._scene = new _three2.default.Scene();
-	        this._sceneRTT = new _three2.default.Scene();
-
-	        this.initRenderer(canvas);
-	        this.resize(100, 100);
-
-	        this.initGeometry();
-
-	        //   new ResizeSensor(container, this.onWindowResize.bind(this));
-	        //   this.onWindowResize();
-	    }
-
-	    _createClass(MedianRenderer, [{
-	        key: 'initRenderer',
-	        value: function initRenderer(canvas) {
-	            this._renderer = new _three2.default.WebGLRenderer({
-	                canvas: canvas
-	            });
-	            this._renderer.setClearColor(0xffffff, 0);
-	            this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
-	        }
-	    }, {
-	        key: 'initGeometry',
-	        value: function initGeometry() {
-	            var plane = new _three2.default.PlaneGeometry(2, 2);
-
-	            this._material = new _three2.default.ShaderMaterial(default_shader_config.default);
-	            this._sceneRTT.add(new _three2.default.Mesh(plane, this._material));
-
-	            this._materialScreen = new _three2.default.ShaderMaterial(_screen2.default);
-	            this._scene.add(new _three2.default.Mesh(plane, this._materialScreen));
-	        }
-	    }, {
-	        key: 'setGif',
-	        value: function setGif(imageData, options) {
-	            this._frames = [];
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
-
-	            try {
-	                for (var _iterator = imageData.frames[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                    var frame = _step.value;
-
-	                    var tex = new _three2.default.Texture(frame.canvas);
-	                    tex.needsUpdate = true;
-	                    this._frames.push(tex);
-	                }
-	            } catch (err) {
-	                _didIteratorError = true;
-	                _iteratorError = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion && _iterator.return) {
-	                        _iterator.return();
-	                    }
-	                } finally {
-	                    if (_didIteratorError) {
-	                        throw _iteratorError;
-	                    }
-	                }
-	            }
-
-	            this._material.uniforms.frameWeight.value = 1.0 / imageData.frames.length;
-	            this._material.uniforms.frameWeight.needsUpdate = true;
-
-	            this.resize(imageData.width, imageData.height);
-
-	            this.setOptions(options);
-	            this.setCurrentFrame(0);
-	        }
-	    }, {
-	        key: 'setCurrentFrame',
-	        value: function setCurrentFrame(frame) {
-	            this._currentFrame = frame;
-	            this.animate();
-	        }
-	    }, {
-	        key: 'setOptions',
-	        value: function setOptions(options) {}
-	    }, {
-	        key: 'resize',
-	        value: function resize(width, height) {
-	            this._camera = new _three2.default.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -10000, 10000);
-	            this._camera.position.z = 100;
-
-	            this._rtTexture1 = new _three2.default.WebGLRenderTarget(width, height, {
-	                minFilter: _three2.default.LinearFilter,
-	                magFilter: _three2.default.NearestFilter,
-	                format: _three2.default.RGBFormat
-	            });
-
-	            this._rtTexture2 = new _three2.default.WebGLRenderTarget(width, height, {
-	                minFilter: _three2.default.LinearFilter,
-	                magFilter: _three2.default.NearestFilter,
-	                format: _three2.default.RGBFormat
-	            });
-
-	            this._renderer.setSize(width, height);
-	        }
-
-	        /**
-	         * Main update function.
-	         */
-
-	    }, {
-	        key: 'update',
-	        value: function update(delta) {
-	            this._currentFrame++;
-	        }
-	    }, {
-	        key: 'animate',
-	        value: function animate() {
-	            var delta = this._clock.getDelta();
-	            this.update(delta);
-	            this.render(delta);
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render(delta) {
-	            var source = emptyTexture;
-	            var dest = this._rtTexture1;
-
-	            for (var startFrame = this._currentFrame; startFrame < this._frames.length; startFrame += default_shader_config.arraySize) {
-	                var textures = [];
-	                for (var i = startFrame; i < startFrame + default_shader_config.arraySize && i < this._frames.length; ++i) {
-	                    var tex = this._frames[i % this._frames.length];
-	                    textures.push(tex);
-	                }
-	                this._material.uniforms.frames.value = textures;
-	                this._material.uniforms.frames.needsUpdate = true;
-
-	                this._material.uniforms.sourceTexture.value = source;
-	                this._material.uniforms.sourceTexture.needsUpdate = true;
-
-	                this._renderer.render(this._sceneRTT, this._camera, dest, true);
-
-	                source = dest;
-	                dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1;
-	            }
-
-	            this._materialScreen.uniforms.tDiffuse.value = source;
-	            this._materialScreen.uniforms.tDiffuse.needsUpdate = true;
-
-	            this._renderer.render(this._scene, this._camera);
-	        }
-	    }]);
-
-	    return MedianRenderer;
-	}();
-
-	exports.default = MedianRenderer;
 
 /***/ }
 /******/ ]);
