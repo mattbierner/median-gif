@@ -30182,8 +30182,6 @@
 	    value: true
 	});
 
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(1);
@@ -30194,206 +30192,21 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _three = __webpack_require__(214);
+	var _median_renderer = __webpack_require__(222);
 
-	var _three2 = _interopRequireDefault(_three);
-
-	var _main = __webpack_require__(215);
-
-	var default_shader_config = _interopRequireWildcard(_main);
-
-	var _screen = __webpack_require__(216);
-
-	var _screen2 = _interopRequireDefault(_screen);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	var _median_renderer2 = _interopRequireDefault(_median_renderer);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var emptyTexture = new _three2.default.Texture();
-
-	var Viewer = function () {
-	    function Viewer(canvas, container) {
-	        _classCallCheck(this, Viewer);
-
-	        this._frames = [];
-
-	        this.container = container;
-
-	        this.mouse = null;
-
-	        this._clock = new _three2.default.Clock();
-
-	        this._scene = new _three2.default.Scene();
-	        this._sceneRTT = new _three2.default.Scene();
-
-	        this.initRenderer(canvas);
-	        this.initCamera();
-
-	        this.initGeometry();
-
-	        //   new ResizeSensor(container, this.onWindowResize.bind(this));
-	        //   this.onWindowResize();
-	    }
-
-	    _createClass(Viewer, [{
-	        key: '_getViewportSize',
-	        value: function _getViewportSize() {
-	            var rect = this.container.getBoundingClientRect();
-	            return [rect.width, rect.height];
-	        }
-	    }, {
-	        key: 'initRenderer',
-	        value: function initRenderer(canvas) {
-	            this._renderer = new _three2.default.WebGLRenderer({
-	                canvas: canvas
-	            });
-	            this._renderer.setClearColor(0xffffff, 0);
-	            this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
-	        }
-	    }, {
-	        key: 'initCamera',
-	        value: function initCamera() {
-	            var _getViewportSize2 = this._getViewportSize();
-
-	            var _getViewportSize3 = _slicedToArray(_getViewportSize2, 2);
-
-	            var viewWidth = _getViewportSize3[0];
-	            var viewHeight = _getViewportSize3[1];
-
-
-	            this._camera = new _three2.default.OrthographicCamera(viewWidth / -2, viewWidth / 2, viewHeight / 2, viewHeight / -2, -10000, 10000);
-	            this._camera.position.z = 100;
-
-	            this._rtTexture1 = new _three2.default.WebGLRenderTarget(viewWidth, viewHeight, {
-	                minFilter: _three2.default.LinearFilter,
-	                magFilter: _three2.default.NearestFilter,
-	                format: _three2.default.RGBFormat
-	            });
-
-	            this._rtTexture2 = new _three2.default.WebGLRenderTarget(viewWidth, viewHeight, {
-	                minFilter: _three2.default.LinearFilter,
-	                magFilter: _three2.default.NearestFilter,
-	                format: _three2.default.RGBFormat
-	            });
-	        }
-	    }, {
-	        key: 'initGeometry',
-	        value: function initGeometry() {
-	            var plane = new _three2.default.PlaneGeometry(2, 2);
-
-	            this._material = new _three2.default.ShaderMaterial(default_shader_config.default);
-	            this._sceneRTT.add(new _three2.default.Mesh(plane, this._material));
-
-	            this._materialScreen = new _three2.default.ShaderMaterial(_screen2.default);
-	            this._scene.add(new _three2.default.Mesh(plane, this._materialScreen));
-	        }
-	    }, {
-	        key: 'setGif',
-	        value: function setGif(imageData, options) {
-	            this._frames = [];
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
-
-	            try {
-	                for (var _iterator = imageData.frames[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                    var frame = _step.value;
-
-	                    var tex = new _three2.default.Texture(frame.canvas);
-	                    tex.needsUpdate = true;
-	                    this._frames.push(tex);
-	                }
-	            } catch (err) {
-	                _didIteratorError = true;
-	                _iteratorError = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion && _iterator.return) {
-	                        _iterator.return();
-	                    }
-	                } finally {
-	                    if (_didIteratorError) {
-	                        throw _iteratorError;
-	                    }
-	                }
-	            }
-
-	            this._material.uniforms.frameWeight.value = 1.0 / imageData.frames.length;
-	            this._material.uniforms.frameWeight.needsUpdate = true;
-
-	            this.setCurrentFrame(0);
-	        }
-	    }, {
-	        key: 'setCurrentFrame',
-	        value: function setCurrentFrame(frame) {
-	            this._currentFrame = frame;
-	            this.animate();
-	        }
-	    }, {
-	        key: 'setOptions',
-	        value: function setOptions(options) {}
-
-	        /**
-	         * Main update function.
-	         */
-
-	    }, {
-	        key: 'update',
-	        value: function update(delta) {
-	            this._currentFrame++;
-	        }
-	    }, {
-	        key: 'animate',
-	        value: function animate() {
-	            var delta = this._clock.getDelta();
-	            this.update(delta);
-	            this.render(delta);
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render(delta) {
-	            var source = emptyTexture;
-	            var dest = this._rtTexture1;
-
-	            for (var startFrame = this._currentFrame; startFrame < this._frames.length; startFrame += default_shader_config.arraySize) {
-	                var textures = [];
-	                for (var i = startFrame; i < startFrame + default_shader_config.arraySize && i < this._frames.length; ++i) {
-	                    var tex = this._frames[i % this._frames.length];
-	                    textures.push(tex);
-	                }
-	                this._material.uniforms.frames.value = textures;
-	                this._material.uniforms.frames.needsUpdate = true;
-
-	                this._material.uniforms.sourceTexture.value = source;
-	                this._material.uniforms.sourceTexture.needsUpdate = true;
-
-	                this._renderer.render(this._sceneRTT, this._camera, dest, true);
-
-	                source = dest;
-	                dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1;
-	            }
-
-	            this._materialScreen.uniforms.tDiffuse.value = source;
-	            this._materialScreen.uniforms.tDiffuse.needsUpdate = true;
-
-	            this._renderer.render(this._scene, this._camera);
-	        }
-	    }]);
-
-	    return Viewer;
-	}();
-
 	/**
-	 * Renders a scanlined gif. 
+	 * Renders a median blended gif. 
 	 */
-
 
 	var GifRenderer = function (_React$Component) {
 	    _inherits(GifRenderer, _React$Component);
@@ -30409,7 +30222,7 @@
 	        value: function componentDidMount() {
 	            this._container = _reactDom2.default.findDOMNode(this);
 	            this._canvas = this._container.getElementsByClassName('gif-canvas')[0];
-	            this._renderer = new Viewer(this._canvas, this._container);
+	            this._renderer = new _median_renderer2.default(this._canvas, this._container);
 
 	            this.drawGifForOptions(this.props.imageData);
 	        }
@@ -30436,7 +30249,7 @@
 	            return _react2.default.createElement(
 	                'div',
 	                null,
-	                _react2.default.createElement('canvas', { className: 'gif-canvas', width: '500', height: '300' })
+	                _react2.default.createElement('canvas', { className: 'gif-canvas', width: '100', height: '100' })
 	            );
 	        }
 	    }]);
@@ -35429,6 +35242,214 @@
 	}
 
 	module.exports = LZWEncoder;
+
+/***/ },
+/* 222 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _three = __webpack_require__(214);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	var _main = __webpack_require__(215);
+
+	var default_shader_config = _interopRequireWildcard(_main);
+
+	var _screen = __webpack_require__(216);
+
+	var _screen2 = _interopRequireDefault(_screen);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var emptyTexture = new _three2.default.Texture();
+
+	var MedianRenderer = function () {
+	    function MedianRenderer(canvas, container) {
+	        _classCallCheck(this, MedianRenderer);
+
+	        this._frames = [];
+
+	        this.container = container;
+
+	        this.mouse = null;
+
+	        this._clock = new _three2.default.Clock();
+
+	        this._scene = new _three2.default.Scene();
+	        this._sceneRTT = new _three2.default.Scene();
+
+	        this.initRenderer(canvas);
+	        this.initCamera();
+
+	        this.initGeometry();
+
+	        //   new ResizeSensor(container, this.onWindowResize.bind(this));
+	        //   this.onWindowResize();
+	    }
+
+	    _createClass(MedianRenderer, [{
+	        key: '_getViewportSize',
+	        value: function _getViewportSize() {
+	            var rect = this.container.getBoundingClientRect();
+	            return [rect.width, rect.height];
+	        }
+	    }, {
+	        key: 'initRenderer',
+	        value: function initRenderer(canvas) {
+	            this._renderer = new _three2.default.WebGLRenderer({
+	                canvas: canvas
+	            });
+	            this._renderer.setClearColor(0xffffff, 0);
+	            this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+	        }
+	    }, {
+	        key: 'initCamera',
+	        value: function initCamera() {
+	            var _getViewportSize2 = this._getViewportSize();
+
+	            var _getViewportSize3 = _slicedToArray(_getViewportSize2, 2);
+
+	            var viewWidth = _getViewportSize3[0];
+	            var viewHeight = _getViewportSize3[1];
+
+
+	            this._camera = new _three2.default.OrthographicCamera(-viewWidth / 2, viewWidth / 2, viewHeight / 2, -viewHeight / 2, -10000, 10000);
+	            this._camera.position.z = 100;
+
+	            this._rtTexture1 = new _three2.default.WebGLRenderTarget(viewWidth, viewHeight, {
+	                minFilter: _three2.default.LinearFilter,
+	                magFilter: _three2.default.NearestFilter,
+	                format: _three2.default.RGBFormat
+	            });
+
+	            this._rtTexture2 = new _three2.default.WebGLRenderTarget(viewWidth, viewHeight, {
+	                minFilter: _three2.default.LinearFilter,
+	                magFilter: _three2.default.NearestFilter,
+	                format: _three2.default.RGBFormat
+	            });
+	        }
+	    }, {
+	        key: 'initGeometry',
+	        value: function initGeometry() {
+	            var plane = new _three2.default.PlaneGeometry(2, 2);
+
+	            this._material = new _three2.default.ShaderMaterial(default_shader_config.default);
+	            this._sceneRTT.add(new _three2.default.Mesh(plane, this._material));
+
+	            this._materialScreen = new _three2.default.ShaderMaterial(_screen2.default);
+	            this._scene.add(new _three2.default.Mesh(plane, this._materialScreen));
+	        }
+	    }, {
+	        key: 'setGif',
+	        value: function setGif(imageData, options) {
+	            this._frames = [];
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
+	            try {
+	                for (var _iterator = imageData.frames[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var frame = _step.value;
+
+	                    var tex = new _three2.default.Texture(frame.canvas);
+	                    tex.needsUpdate = true;
+	                    this._frames.push(tex);
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+
+	            this._material.uniforms.frameWeight.value = 1.0 / imageData.frames.length;
+	            this._material.uniforms.frameWeight.needsUpdate = true;
+
+	            this.setCurrentFrame(0);
+	        }
+	    }, {
+	        key: 'setCurrentFrame',
+	        value: function setCurrentFrame(frame) {
+	            this._currentFrame = frame;
+	            this.animate();
+	        }
+	    }, {
+	        key: 'setOptions',
+	        value: function setOptions(options) {}
+
+	        /**
+	         * Main update function.
+	         */
+
+	    }, {
+	        key: 'update',
+	        value: function update(delta) {
+	            this._currentFrame++;
+	        }
+	    }, {
+	        key: 'animate',
+	        value: function animate() {
+	            var delta = this._clock.getDelta();
+	            this.update(delta);
+	            this.render(delta);
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render(delta) {
+	            var source = emptyTexture;
+	            var dest = this._rtTexture1;
+
+	            for (var startFrame = this._currentFrame; startFrame < this._frames.length; startFrame += default_shader_config.arraySize) {
+	                var textures = [];
+	                for (var i = startFrame; i < startFrame + default_shader_config.arraySize && i < this._frames.length; ++i) {
+	                    var tex = this._frames[i % this._frames.length];
+	                    textures.push(tex);
+	                }
+	                this._material.uniforms.frames.value = textures;
+	                this._material.uniforms.frames.needsUpdate = true;
+
+	                this._material.uniforms.sourceTexture.value = source;
+	                this._material.uniforms.sourceTexture.needsUpdate = true;
+
+	                this._renderer.render(this._sceneRTT, this._camera, dest, true);
+
+	                source = dest;
+	                dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1;
+	            }
+
+	            this._materialScreen.uniforms.tDiffuse.value = source;
+	            this._materialScreen.uniforms.tDiffuse.needsUpdate = true;
+
+	            this._renderer.render(this._scene, this._camera);
+	        }
+	    }]);
+
+	    return MedianRenderer;
+	}();
+
+	exports.default = MedianRenderer;
 
 /***/ }
 /******/ ]);
