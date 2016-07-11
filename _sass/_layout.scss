@@ -1,0 +1,32 @@
+html, body {
+    min-height: 100vh;
+    min-width: 100%;
+}
+
+.content-wrapper {
+    max-width: 600px;
+    padding: 0 1em;
+    margin: 0 auto;
+}
+
+
+body {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.spacer {
+    flex: 1;
+}
+
+.loading-spinner {
+    color: #aaa;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0); }
+    to { transform: rotate(360deg); }
+}
+

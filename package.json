@@ -1,0 +1,36 @@
+{
+  "name": "median.gif",
+  "version": "0.0.0",
+  "description": "Median blending gifs",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mattbierner/median-gif.git"
+  },
+  "keywords": [],
+  "author": "Matt Bierner (http://mattbierner.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mattbierner/median-gif/issues"
+  },
+  "homepage": "https://mattbierner.github.io/median-gif",
+  "devDependencies": {
+    "babel": "^5.6.23",
+    "babel-core": "^6.8.0",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.3.0",
+    "babel-preset-react": "^6.5.0",
+    "imports-loader": "^0.6.5",
+    "webpack": "^1.13.0"
+  },
+  "dependencies": {
+    "chroma-js": "^1.1.1",
+    "gif-encoder": "^0.4.1",
+    "giphy-api": "^1.1.16",
+    "omggif": "^1.0.8",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "three": "^0.78.0"
+  }
+}

@@ -1,0 +1,15 @@
+title: "median.gif"
+
+description: "Median blending gifs"
+
+# Build settings
+markdown: kramdown
+
+exclude: [
+    "documentation",
+    "node_modules",
+    "process_data",
+    "server",
+    "src",
+    "webpack.config.js"
+]

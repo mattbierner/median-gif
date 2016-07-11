@@ -1,0 +1,115 @@
+/**
+    Generic controls
+*/
+
+.labeled-slider {
+    .slider {
+        display: block;
+        width: 100%;
+    }
+
+    .min {
+        display: block;
+        float: left;
+        margin-left: 0.2em;
+    }
+
+    .max {
+        display: block;
+        float: right;
+        margin-right: 0.2em;
+    }
+
+    .value {
+        display: block;
+    }
+}
+
+.label {
+    font-size: 12px;
+    color: $light-gray;
+}
+
+.control-description {
+    font-size: 12px;
+    color: $light-gray;
+    font-style: italic;
+}
+
+
+input[type=range] {
+    -webkit-appearance: none;
+    height: 28px;
+    background: none; 
+
+    &:focus {
+        outline: none;
+    }
+
+    &::-webkit-slider-thumb{
+        -webkit-appearance: none;
+        width: 14px;
+        height: 26px;
+        margin-top: -10px;
+        border: 1px solid #aaa;
+        background: $background-color;
+    }
+
+    &::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 1px;
+        background: $text-color;
+    }
+
+     &::-ms-track {
+        width: 100%;
+        height: 1px;
+        background: $text-color;
+    }
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    background: none;
+    border: none;
+    padding: 0.4em 1em;
+    padding-right: 22px;
+    border-radius: 0;
+    background: url("data:image/svg+xml;utf8,<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='24' height='24' viewBox='0 0 24 24'><path fill='#444' d='M7.406 7.828l4.594 4.594 4.594-4.594 1.406 1.406-6 6-6-6z'></path></svg>");
+    background-position: 100% 50%;
+    background-repeat: no-repeat;
+    outline: none;
+
+    &:active {
+        outline: none;
+    }
+
+    &:hover {
+        background-color: $lightest-gray;
+    }
+}
+
+button {
+    background: none;
+    border: 1px solid $text-color;
+    border-radius: 0;
+    outline: none;
+    color: $text-color;
+    padding: 6px 12px;
+
+    &:hover {
+        background-color: $lightest-gray;
+    }
+
+    &:active {
+        outline: none;
+    }
+}
+
+button.material-icons {
+    border: none;
+    padding: 0;
+}
