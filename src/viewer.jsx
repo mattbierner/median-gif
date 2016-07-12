@@ -38,6 +38,35 @@ class WrapModeSelector extends React.Component {
 }
 
 /**
+ * Wrapping mode for frame selections
+ */
+const sampleModes = {
+    'forward': {
+        title: 'Forwards',
+        description: 'Select frames after the current frame'
+    },
+    'reverse': {
+        title: 'Reverse',
+        description: 'Select frames before the current frame.'
+    },
+    'bi': {
+        title: 'Bi-Dirrectional',
+        description: 'Select frames both before and after the current frame.'
+    }
+};
+
+/**
+ * Control for selecting frame selection mode.
+ */
+class SampleModeSelector extends React.Component {
+    render() {
+        return (
+            <LabeledSelector {...this.props} title="Sample Mode" options={sampleModes} />
+        );
+    }
+}
+
+/**
  * Displays an interative scanlined gif with controls. 
  */
 export default class Viewer extends React.Component {
@@ -57,6 +86,7 @@ export default class Viewer extends React.Component {
 
             // median
             wrapMode: Object.keys(wrapModes)[0],
+            sampleMode: Object.keys(sampleModes)[0],
             numberOfFramesToSample: 1
 
         };
@@ -138,6 +168,11 @@ export default class Viewer extends React.Component {
         this.setState({ numberOfFramesToSample: value });
     }
 
+    onSampleModeChange(e) {
+        const value = e.target.value;
+        this.setState({ sampleMode: value });
+    }
+
     onExport() {
         this.setState({ exporting: true });
         exportGif(this.state.imageData, this.state).then(blob => {
@@ -155,6 +190,7 @@ export default class Viewer extends React.Component {
                 </div>
                 <div className="view-controls">
                     <WrapModeSelector value={this.state.wrapMode} onChange={this.onWrapModeChange.bind(this) } />
+                    <SampleModeSelector value={this.state.sampleMode} onChange={this.onSampleModeChange.bind(this) } />
 
                     <div className="frame-controls">
                         <div className="full-width">

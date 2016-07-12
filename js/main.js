@@ -28550,19 +28550,62 @@
 	}(_react2.default.Component);
 
 	/**
+	 * Wrapping mode for frame selections
+	 */
+
+
+	var sampleModes = {
+	    'forward': {
+	        title: 'Forwards',
+	        description: 'Select frames after the current frame'
+	    },
+	    'reverse': {
+	        title: 'Reverse',
+	        description: 'Select frames before the current frame.'
+	    },
+	    'bi': {
+	        title: 'Bi-Dirrectional',
+	        description: 'Select frames both before and after the current frame.'
+	    }
+	};
+
+	/**
+	 * Control for selecting frame selection mode.
+	 */
+
+	var SampleModeSelector = function (_React$Component2) {
+	    _inherits(SampleModeSelector, _React$Component2);
+
+	    function SampleModeSelector() {
+	        _classCallCheck(this, SampleModeSelector);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(SampleModeSelector).apply(this, arguments));
+	    }
+
+	    _createClass(SampleModeSelector, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Sample Mode', options: sampleModes }));
+	        }
+	    }]);
+
+	    return SampleModeSelector;
+	}(_react2.default.Component);
+
+	/**
 	 * Displays an interative scanlined gif with controls. 
 	 */
 
 
-	var Viewer = function (_React$Component2) {
-	    _inherits(Viewer, _React$Component2);
+	var Viewer = function (_React$Component3) {
+	    _inherits(Viewer, _React$Component3);
 
 	    function Viewer(props) {
 	        _classCallCheck(this, Viewer);
 
-	        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Viewer).call(this, props));
+	        var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Viewer).call(this, props));
 
-	        _this2.state = {
+	        _this3.state = {
 	            imageData: null,
 	            loadingGif: false,
 	            exporting: false,
@@ -28576,10 +28619,11 @@
 
 	            // median
 	            wrapMode: Object.keys(wrapModes)[0],
+	            sampleMode: Object.keys(sampleModes)[0],
 	            numberOfFramesToSample: 1
 
 	        };
-	        return _this2;
+	        return _this3;
 	    }
 
 	    _createClass(Viewer, [{
@@ -28597,13 +28641,13 @@
 	    }, {
 	        key: 'loadGif',
 	        value: function loadGif(file) {
-	            var _this3 = this;
+	            var _this4 = this;
 
 	            this.setState({ loadingGif: true });
 	            (0, _loadGif3.default)(file).then(function (data) {
-	                if (file !== _this3.props.file) return;
+	                if (file !== _this4.props.file) return;
 
-	                _this3.setState({
+	                _this4.setState({
 	                    imageData: data,
 	                    loadingGif: false,
 	                    error: null,
@@ -28619,10 +28663,10 @@
 	                    numberOfFramesToSample: Math.ceil(data.frames.length / 2)
 	                });
 	            }).catch(function (e) {
-	                if (file !== _this3.props.file) return;
+	                if (file !== _this4.props.file) return;
 
 	                console.error(e);
-	                _this3.setState({
+	                _this4.setState({
 	                    imageData: [],
 	                    loadingGif: false,
 	                    error: 'Could not load gif'
@@ -28666,13 +28710,19 @@
 	            this.setState({ numberOfFramesToSample: value });
 	        }
 	    }, {
+	        key: 'onSampleModeChange',
+	        value: function onSampleModeChange(e) {
+	            var value = e.target.value;
+	            this.setState({ sampleMode: value });
+	        }
+	    }, {
 	        key: 'onExport',
 	        value: function onExport() {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            this.setState({ exporting: true });
 	            (0, _gif_export2.default)(this.state.imageData, this.state).then(function (blob) {
-	                _this4.setState({ exporting: false });
+	                _this5.setState({ exporting: false });
 	                var url = URL.createObjectURL(blob);
 	                window.open(url);
 	            });
@@ -28692,6 +28742,7 @@
 	                    'div',
 	                    { className: 'view-controls' },
 	                    _react2.default.createElement(WrapModeSelector, { value: this.state.wrapMode, onChange: this.onWrapModeChange.bind(this) }),
+	                    _react2.default.createElement(SampleModeSelector, { value: this.state.sampleMode, onChange: this.onSampleModeChange.bind(this) }),
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'frame-controls' },
@@ -30301,21 +30352,22 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return this.renderToScreen(this.renderMedian(this._options.currentFrame, this._options.frameIncrement, this._options.numberOfFramesToSample, this._options.wrapMode));
+	            return this.renderToScreen(this.renderMedian(this._options.currentFrame, this._options.frameIncrement, this._options.sampleMode, this._options.numberOfFramesToSample, this._options.wrapMode));
 	        }
 	    }, {
 	        key: 'renderMedian',
-	        value: function renderMedian(initialFrame, frameIncrement, numberOfFramesToSample, wrapMode) {
+	        value: function renderMedian(initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
 	            var source = emptyTexture;
 	            var dest = this._rtTexture1;
 
-	            var remaining = numberOfFramesToSample;
+	            var mul = sampleMode === 'reverse' ? -1 : 1;
+
 	            for (var startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
 	                var textures = (0, _gen_array2.default)(median_shader_config.arraySize, emptyTexture);
 	                var weights = (0, _gen_array2.default)(median_shader_config.arraySize, 0);
 
 	                for (var i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-	                    var index = initialFrame + (startFrame + i) * frameIncrement;
+	                    var index = initialFrame + mul * ((startFrame + i) * frameIncrement);
 
 	                    var _getFrame = this.getFrame(index, wrapMode);
 
@@ -30366,7 +30418,10 @@
 	                case 'overflow':
 	                default:
 	                    {
-	                        var _tex2 = this._frames[index % this._frames.length];
+	                        index %= this._frames.length;
+	                        if (index < 0) index = this._frames.length - 1 - Math.abs(index);
+
+	                        var _tex2 = this._frames[index];
 	                        var _weight2 = 1.0 / this._options.numberOfFramesToSample;
 	                        return [_tex2, _weight2];
 	                    }

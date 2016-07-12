@@ -91,21 +91,23 @@ export default class MedianRenderer {
         return this.renderToScreen(this.renderMedian(
             this._options.currentFrame,
             this._options.frameIncrement,
+            this._options.sampleMode,
             this._options.numberOfFramesToSample,
             this._options.wrapMode));
     }
 
-    renderMedian(initialFrame, frameIncrement, numberOfFramesToSample, wrapMode) {
+    renderMedian(initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
         let source = emptyTexture;
         let dest = this._rtTexture1;
 
-        const remaining = numberOfFramesToSample;
+        const mul = sampleMode === 'reverse' ? -1 : 1
+
         for (let startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
             const textures = gen_array(median_shader_config.arraySize, emptyTexture);
             const weights = gen_array(median_shader_config.arraySize, 0);
 
             for (let i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-                const index = (initialFrame + (startFrame + i) * frameIncrement);
+                const index = (initialFrame + mul * ((startFrame + i) * frameIncrement));
                 const [tex, weight] = this.getFrame(index, wrapMode);
                 textures[i] = tex;
                 weights[i] = weight;
@@ -148,7 +150,11 @@ export default class MedianRenderer {
         case 'overflow':
         default:
         {
-            const tex = this._frames[index % this._frames.length];
+            index %= this._frames.length;
+            if (index < 0)
+                index = this._frames.length - 1 - Math.abs(index);
+            
+            const tex = this._frames[index];
             const weight = 1.0 / (this._options.numberOfFramesToSample);
             return [tex, weight];
         }
