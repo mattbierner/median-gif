@@ -28510,9 +28510,9 @@
 	        title: 'Overflow',
 	        description: 'overflow'
 	    },
-	    'end': {
-	        title: 'End',
-	        description: 'end'
+	    'clamp': {
+	        title: 'Clamp',
+	        description: 'clamp'
 	    },
 	    'stop': {
 	        title: 'Stop',
@@ -30182,6 +30182,8 @@
 	    value: true
 	});
 
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _three = __webpack_require__(215);
@@ -30332,9 +30334,17 @@
 	                var weights = (0, _gen_array2.default)(median_shader_config.arraySize, 0);
 
 	                for (var i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-	                    var tex = this._frames[(initialFrame + (startFrame + i) * frameIncrement) % this._frames.length];
+	                    var index = initialFrame + (startFrame + i) * frameIncrement;
+
+	                    var _getFrame = this.getFrame(index, wrapMode);
+
+	                    var _getFrame2 = _slicedToArray(_getFrame, 2);
+
+	                    var tex = _getFrame2[0];
+	                    var weight = _getFrame2[1];
+
 	                    textures[i] = tex;
-	                    weights[i] = 1.0 / this._options.numberOfFramesToSample;
+	                    weights[i] = weight;
 	                }
 	                this._material.uniforms.frames.value = textures;
 	                this._material.uniforms.frames.needsUpdate = true;
@@ -30351,6 +30361,35 @@
 	                dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1;
 	            }
 	            return source.texture || source;
+	        }
+	    }, {
+	        key: 'getFrame',
+	        value: function getFrame(index, wrapMode) {
+	            switch (wrapMode) {
+	                case 'clamp':
+	                    {
+	                        var tex = this._frames[Math.max(0, Math.min(index, this._frames.length - 1))];
+	                        var weight = 1.0 / this._options.numberOfFramesToSample;
+	                        return [tex, weight];
+	                    }
+	                case 'stop':
+	                    {
+	                        if (_tex < 0 || _tex > this._frames.length) {
+	                            return [emptyTexture, 0];
+	                        }
+	                        var _tex = this._frames[index];
+	                        var _weight = 1.0 / this._options.numberOfFramesToSample;
+	                        return [_tex, _weight];
+	                    }
+
+	                case 'overflow':
+	                default:
+	                    {
+	                        var _tex2 = this._frames[index % this._frames.length];
+	                        var _weight2 = 1.0 / this._options.numberOfFramesToSample;
+	                        return [_tex2, _weight2];
+	                    }
+	            }
 	        }
 	    }]);
 

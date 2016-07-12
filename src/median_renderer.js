@@ -105,9 +105,10 @@ export default class MedianRenderer {
             const weights = gen_array(median_shader_config.arraySize, 0);
 
             for (let i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-                const tex = this._frames[(initialFrame + (startFrame + i) * frameIncrement) % this._frames.length];
+                const index = (initialFrame + (startFrame + i) * frameIncrement);
+                const [tex, weight] = this.getFrame(index, wrapMode);
                 textures[i] = tex;
-                weights[i] = 1.0 / (this._options.numberOfFramesToSample);
+                weights[i] = weight;
             }
             this._material.uniforms.frames.value = textures
             this._material.uniforms.frames.needsUpdate = true;
@@ -124,5 +125,33 @@ export default class MedianRenderer {
             dest = (dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1); 
         }
         return source.texture || source;
+    }
+
+    getFrame(index, wrapMode) {
+        switch (wrapMode) {
+        case 'clamp':
+        {
+            const tex = this._frames[Math.max(0, Math.min(index, this._frames.length - 1))];
+            const weight = 1.0 / (this._options.numberOfFramesToSample);
+            return [tex, weight];
+        }
+        case 'stop':
+        {
+            if (tex < 0 || tex > this._frames.length) {
+                return [emptyTexture, 0];
+            }
+            const tex = this._frames[index];
+            const weight = 1.0 / (this._options.numberOfFramesToSample);
+            return [tex, weight];
+        }
+
+        case 'overflow':
+        default:
+        {
+            const tex = this._frames[index % this._frames.length];
+            const weight = 1.0 / (this._options.numberOfFramesToSample);
+            return [tex, weight];
+        }
+        }
     }
 }

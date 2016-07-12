@@ -15,9 +15,9 @@ const wrapModes = {
         title: 'Overflow',
         description: 'overflow'
     },
-    'end': {
-        title: 'End',
-        description: 'end'
+    'clamp': {
+        title: 'Clamp',
+        description: 'clamp'
     },
     'stop': {
         title: 'Stop',
