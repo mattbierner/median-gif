@@ -82,7 +82,7 @@ export default class MedianRenderer {
      * Main render function.
      */
     render() {
-        return this.renderToScreen(this.renderMedian(source,
+        return this.renderToScreen(this.renderMedian(
             this._options.currentFrame,
             this._options.frameIncrement,
             this._options.sampleMode,
@@ -103,20 +103,32 @@ export default class MedianRenderer {
     /**
      * Render for median blending. Renders to a texture.
      */
-    renderMedian(source, initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
-        let dest = this._rtTexture1;
+    renderMedian(initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
+        if (sampleMode === 'bi') {
+            const backwards = this.renderMedianImpl(emptyTexture, 0.5, initialFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode)
+            return  this.renderMedianImpl(backwards, 0.5, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode);
+        }
+        return this.renderMedianImpl(
+            emptyTexture,
+            1,
+            initialFrame,
+            sampleMode === 'reverse' ? -frameIncrement : frameIncrement,
+            numberOfFramesToSample,
+            wrapMode);
+    }
 
-        const mul = sampleMode === 'reverse' ? -1 : 1
+    renderMedianImpl(source, mul, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode) {
+        let dest = source === this._rtTexture1.texture ? this._rtTexture2 : this._rtTexture1;
 
         for (let startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
             const textures = gen_array(median_shader_config.arraySize, emptyTexture);
             const weights = gen_array(median_shader_config.arraySize, 0);
 
             for (let i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-                const index = (initialFrame + mul * ((startFrame + i) * frameIncrement));
+                const index = initialFrame + (startFrame + i) * frameIncrement;
                 const [tex, weight] = this.getFrame(index, wrapMode);
                 textures[i] = tex;
-                weights[i] = weight;
+                weights[i] = weight * mul;
             }
             
             source = this.renderGifFrames(textures, weights, source, dest);
