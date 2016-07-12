@@ -13,7 +13,7 @@ import exportGif from './gif_export';
 const modes = {
     'median': {
         title: 'Median Blend',
-        description: 'Blends all frames of the animation with equal weight.'
+        description: 'Blends frames of the animation with equal weight.'
     },
 };
 
@@ -31,7 +31,8 @@ class ModeSelector extends React.Component {
                     {modeOptions}
                 </select>
                 <div className="control-description">{modes[this.props.value].description}</div>
-            </div>);
+            </div>
+        );
     }
 }
 
@@ -53,6 +54,9 @@ export default class Viewer extends React.Component {
             initialFrame: 0,
             frameIncrement: 1,
             playbackSpeed: 1,
+
+            // median
+            numberOfFramesToSample: 1
 
         };
     }
@@ -85,6 +89,9 @@ export default class Viewer extends React.Component {
                     initialFrame: 0,
 
                     frameIncrement: 1,
+
+                    // median
+                    numberOfFramesToSample: Math.ceil(data.frames.length / 2)
                 });
             })
             .catch(e => {
@@ -103,11 +110,6 @@ export default class Viewer extends React.Component {
     onModeChange(e) {
         const value = e.target.value;
         this.setState({ mode: value });
-    }
-
-    onGridColumnsChange(e) {
-        const value = +e.target.value;
-        this.setState({ gridColumns: value });
     }
 
     onReverseFrameOrderChange(e) {
@@ -130,24 +132,9 @@ export default class Viewer extends React.Component {
         this.setState({ initialFrame: value });
     }
 
-    onGridRowsChange(e) {
+    onNumberOfFramesToSampleChanged(e) {
         const value = +e.target.value;
-        this.setState({ gridRows: value });
-    }
-
-    onDiagonalAngleChange(e) {
-        const value = +e.target.value;
-        this.setState({ diagonalAngle: value });
-    }
-
-    onDiagonalWidthChange(e) {
-        const value = +e.target.value;
-        this.setState({ diagonalWidth: value });
-    }
-
-    onRadiusWidthChange(e) {
-        const value = +e.target.value;
-        this.setState({ radiusWidth: value });
+        this.setState({ numberOfFramesToSample: value });
     }
 
     onExport() {
@@ -183,6 +170,13 @@ export default class Viewer extends React.Component {
                                 value={this.state.initialFrame}
                                 onChange={this.onInitialFrameChange.bind(this) }/>
                         </div>
+                        <div className="full-width">
+                            <LabeledSlider title='Number of Frames to Sample'
+                                min="1"
+                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
+                                value={this.state.numberOfFramesToSample}
+                                onChange={this.onNumberOfFramesToSampleChanged.bind(this) }/>
+                        </div>
                         <div>
                             <div className="control-group">
                                 <div className='control-title'>Reverse Frames</div>
@@ -194,58 +188,6 @@ export default class Viewer extends React.Component {
                                 <div className='control-title'>Mirror Frames</div>
                                 <input type="checkbox" value={this.state.bounceFrameOrder} onChange={this.onBounceFrameOrderChange.bind(this) }/>
                             </div>
-                        </div>
-                    </div>
-
-                    <div className={"mode-control-set grid-controls " + (this.state.mode === 'grid' ? '' : 'hidden') }>
-                        <h4 className="control-set-label">Grid options</h4>
-                        <div>
-                            <LabeledSlider title="Columns"
-                                units=" columns"
-                                min="1"
-                                max={this.state.imageData ? this.state.imageData.width : 1}
-                                value={this.state.gridColumns}
-                                onChange={this.onGridColumnsChange.bind(this) }/>
-                        </div>
-                        <div>
-                            <LabeledSlider title="Rows"
-                                units=" rows"
-                                min="1"
-                                max={this.state.imageData ? this.state.imageData.height : 1}
-                                value={this.state.gridRows}
-                                onChange={this.onGridRowsChange.bind(this) }/>
-                        </div>
-                    </div>
-
-                    <div className={"mode-control-set diagonal-controls " + (this.state.mode === 'diagonal' ? '' : 'hidden') }>
-                        <h4 className="control-set-label">Diagonal Options</h4>
-                        <div>
-                            <LabeledSlider title="Angle"
-                                units=" deg"
-                                min="0"
-                                max="360"
-                                value={this.state.diagonalAngle}
-                                onChange={this.onDiagonalAngleChange.bind(this) }/>
-                        </div>
-                        <div>
-                            <LabeledSlider title="Step Size"
-                                units="px"
-                                min="1"
-                                max={this.state.imageData ? Math.max(this.state.imageData.height, this.state.imageData.width) : 1}
-                                value={this.state.diagonalWidth}
-                                onChange={this.onDiagonalWidthChange.bind(this) }/>
-                        </div>
-                    </div>
-
-                    <div className={"mode-control-set circle-controls " + (this.state.mode === 'circle' ? '' : 'hidden') }>
-                        <h4 className="control-set-label">Circle Options</h4>
-                        <div className="full-width">
-                            <LabeledSlider title="Step Size"
-                                units="px"
-                                min="1"
-                                max={this.state.imageData ? Math.max(this.state.imageData.height, this.state.imageData.width) / 2 : 1}
-                                value={this.state.radiusWidth}
-                                onChange={this.onRadiusWidthChange.bind(this) }/>
                         </div>
                     </div>
 

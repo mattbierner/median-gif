@@ -1,5 +1,7 @@
 import THREE from 'three';
 
+import gen_array from './gen_array';
+
 import median_shader from './shaders/median';
 import * as median_shader_config from './shaders/median';
 import screen_shader from './shaders/screen';
@@ -45,10 +47,6 @@ export default class MedianRenderer {
             tex.needsUpdate = true;
             this._frames.push(tex);
         }
-
-        this._material.uniforms.frameWeight.value = 1.0 / (imageData.frames.length);
-        this._material.uniforms.frameWeight.needsUpdate = true;
-
         this.resize(imageData.width, imageData.height);
 
         if (options) {
@@ -64,7 +62,10 @@ export default class MedianRenderer {
 
     setOptions(options) {
         this._options = options;
-        console.log(options);
+
+        this._material.uniforms.frameWeight.value = 1.0 / (this._options.numberOfFramesToSample);
+        this._material.uniforms.frameWeight.needsUpdate = true;
+
         this.animate();
     }
 
@@ -109,19 +110,21 @@ export default class MedianRenderer {
     render(delta) {
         switch (this._options.mode) {
         case 'median':
-            return this.renderToScreen(this.renderMedian());
+            return this.renderToScreen(this.renderMedian(this._options.numberOfFramesToSample));
         }
     }
 
-    renderMedian() {
+    renderMedian(numberOfFramesToSample) {
         let source = emptyTexture;
         let dest = this._rtTexture1;
 
-        for (let startFrame = this._currentFrame; startFrame < this._frames.length; startFrame += median_shader_config.arraySize) {
-            const textures = [];
-            for (let i = startFrame; i < startFrame + median_shader_config.arraySize && i < this._frames.length; ++i) {
-                const tex = this._frames[i % this._frames.length];
-                textures.push(tex);
+        const remaining = numberOfFramesToSample;
+        for (let startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
+            const textures = gen_array(median_shader_config.arraySize, emptyTexture);
+
+            for (let i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
+                const tex = this._frames[(this._currentFrame + startFrame + i) % this._frames.length];
+                textures[i] = tex;
             }
             this._material.uniforms.frames.value = textures
             this._material.uniforms.frames.needsUpdate = true;

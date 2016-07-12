@@ -28508,7 +28508,7 @@
 	var modes = {
 	    'median': {
 	        title: 'Median Blend',
-	        description: 'Blends all frames of the animation with equal weight.'
+	        description: 'Blends frames of the animation with equal weight.'
 	    }
 	};
 
@@ -28584,7 +28584,10 @@
 	            bounceFrameOrder: false,
 	            initialFrame: 0,
 	            frameIncrement: 1,
-	            playbackSpeed: 1
+	            playbackSpeed: 1,
+
+	            // median
+	            numberOfFramesToSample: 1
 
 	        };
 	        return _this2;
@@ -28621,7 +28624,10 @@
 	                    bounceFrameOrder: false,
 	                    initialFrame: 0,
 
-	                    frameIncrement: 1
+	                    frameIncrement: 1,
+
+	                    // median
+	                    numberOfFramesToSample: Math.ceil(data.frames.length / 2)
 	                });
 	            }).catch(function (e) {
 	                if (file !== _this3.props.file) return;
@@ -28639,12 +28645,6 @@
 	        value: function onModeChange(e) {
 	            var value = e.target.value;
 	            this.setState({ mode: value });
-	        }
-	    }, {
-	        key: 'onGridColumnsChange',
-	        value: function onGridColumnsChange(e) {
-	            var value = +e.target.value;
-	            this.setState({ gridColumns: value });
 	        }
 	    }, {
 	        key: 'onReverseFrameOrderChange',
@@ -28671,28 +28671,10 @@
 	            this.setState({ initialFrame: value });
 	        }
 	    }, {
-	        key: 'onGridRowsChange',
-	        value: function onGridRowsChange(e) {
+	        key: 'onNumberOfFramesToSampleChanged',
+	        value: function onNumberOfFramesToSampleChanged(e) {
 	            var value = +e.target.value;
-	            this.setState({ gridRows: value });
-	        }
-	    }, {
-	        key: 'onDiagonalAngleChange',
-	        value: function onDiagonalAngleChange(e) {
-	            var value = +e.target.value;
-	            this.setState({ diagonalAngle: value });
-	        }
-	    }, {
-	        key: 'onDiagonalWidthChange',
-	        value: function onDiagonalWidthChange(e) {
-	            var value = +e.target.value;
-	            this.setState({ diagonalWidth: value });
-	        }
-	    }, {
-	        key: 'onRadiusWidthChange',
-	        value: function onRadiusWidthChange(e) {
-	            var value = +e.target.value;
-	            this.setState({ radiusWidth: value });
+	            this.setState({ numberOfFramesToSample: value });
 	        }
 	    }, {
 	        key: 'onExport',
@@ -28744,6 +28726,15 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
+	                            { className: 'full-width' },
+	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Number of Frames to Sample',
+	                                min: '1',
+	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
+	                                value: this.state.numberOfFramesToSample,
+	                                onChange: this.onNumberOfFramesToSampleChanged.bind(this) })
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
 	                            null,
 	                            _react2.default.createElement(
 	                                'div',
@@ -28769,83 +28760,6 @@
 	                                ),
 	                                _react2.default.createElement('input', { type: 'checkbox', value: this.state.bounceFrameOrder, onChange: this.onBounceFrameOrderChange.bind(this) })
 	                            )
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: "mode-control-set grid-controls " + (this.state.mode === 'grid' ? '' : 'hidden') },
-	                        _react2.default.createElement(
-	                            'h4',
-	                            { className: 'control-set-label' },
-	                            'Grid options'
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            null,
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Columns',
-	                                units: ' columns',
-	                                min: '1',
-	                                max: this.state.imageData ? this.state.imageData.width : 1,
-	                                value: this.state.gridColumns,
-	                                onChange: this.onGridColumnsChange.bind(this) })
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            null,
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Rows',
-	                                units: ' rows',
-	                                min: '1',
-	                                max: this.state.imageData ? this.state.imageData.height : 1,
-	                                value: this.state.gridRows,
-	                                onChange: this.onGridRowsChange.bind(this) })
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: "mode-control-set diagonal-controls " + (this.state.mode === 'diagonal' ? '' : 'hidden') },
-	                        _react2.default.createElement(
-	                            'h4',
-	                            { className: 'control-set-label' },
-	                            'Diagonal Options'
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            null,
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Angle',
-	                                units: ' deg',
-	                                min: '0',
-	                                max: '360',
-	                                value: this.state.diagonalAngle,
-	                                onChange: this.onDiagonalAngleChange.bind(this) })
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            null,
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Step Size',
-	                                units: 'px',
-	                                min: '1',
-	                                max: this.state.imageData ? Math.max(this.state.imageData.height, this.state.imageData.width) : 1,
-	                                value: this.state.diagonalWidth,
-	                                onChange: this.onDiagonalWidthChange.bind(this) })
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: "mode-control-set circle-controls " + (this.state.mode === 'circle' ? '' : 'hidden') },
-	                        _react2.default.createElement(
-	                            'h4',
-	                            { className: 'control-set-label' },
-	                            'Circle Options'
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'full-width' },
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Step Size',
-	                                units: 'px',
-	                                min: '1',
-	                                max: this.state.imageData ? Math.max(this.state.imageData.height, this.state.imageData.width) / 2 : 1,
-	                                value: this.state.radiusWidth,
-	                                onChange: this.onRadiusWidthChange.bind(this) })
 	                        )
 	                    ),
 	                    _react2.default.createElement(
@@ -30080,7 +29994,7 @@
 
 	            var start = Date.now();
 	            setTimeout(function () {
-	                if (!_this5.props.imageData || _this5.props.imageData !== imageData || _this5.props.mode === 'median') return;
+	                if (!_this5.props.imageData || _this5.props.imageData !== imageData) return;
 
 	                var nextFrame = _this5.state.currentFrame + 1;
 	                if (nextFrame >= _this5.getNumFrames() && !_this5.state.loop) {
@@ -30135,7 +30049,7 @@
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: "playback-controls content-wrapper " + (this.props.mode === 'median' ? 'hidden' : '') },
+	                    { className: "playback-controls content-wrapper " },
 	                    _react2.default.createElement(_labeled_slider2.default, { className: 'playback-tracker',
 	                        min: '0',
 	                        max: this.getNumFrames() - 1,
@@ -30270,6 +30184,10 @@
 
 	var _three2 = _interopRequireDefault(_three);
 
+	var _gen_array = __webpack_require__(223);
+
+	var _gen_array2 = _interopRequireDefault(_gen_array);
+
 	var _median = __webpack_require__(216);
 
 	var median_shader_config = _interopRequireWildcard(_median);
@@ -30353,9 +30271,6 @@
 	                }
 	            }
 
-	            this._material.uniforms.frameWeight.value = 1.0 / imageData.frames.length;
-	            this._material.uniforms.frameWeight.needsUpdate = true;
-
 	            this.resize(imageData.width, imageData.height);
 
 	            if (options) {
@@ -30373,7 +30288,10 @@
 	        key: 'setOptions',
 	        value: function setOptions(options) {
 	            this._options = options;
-	            console.log(options);
+
+	            this._material.uniforms.frameWeight.value = 1.0 / this._options.numberOfFramesToSample;
+	            this._material.uniforms.frameWeight.needsUpdate = true;
+
 	            this.animate();
 	        }
 	    }, {
@@ -30425,20 +30343,22 @@
 	        value: function render(delta) {
 	            switch (this._options.mode) {
 	                case 'median':
-	                    return this.renderToScreen(this.renderMedian());
+	                    return this.renderToScreen(this.renderMedian(this._options.numberOfFramesToSample));
 	            }
 	        }
 	    }, {
 	        key: 'renderMedian',
-	        value: function renderMedian() {
+	        value: function renderMedian(numberOfFramesToSample) {
 	            var source = emptyTexture;
 	            var dest = this._rtTexture1;
 
-	            for (var startFrame = this._currentFrame; startFrame < this._frames.length; startFrame += median_shader_config.arraySize) {
-	                var textures = [];
-	                for (var i = startFrame; i < startFrame + median_shader_config.arraySize && i < this._frames.length; ++i) {
-	                    var tex = this._frames[i % this._frames.length];
-	                    textures.push(tex);
+	            var remaining = numberOfFramesToSample;
+	            for (var startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
+	                var textures = (0, _gen_array2.default)(median_shader_config.arraySize, emptyTexture);
+
+	                for (var i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
+	                    var tex = this._frames[(this._currentFrame + startFrame + i) % this._frames.length];
+	                    textures[i] = tex;
 	                }
 	                this._material.uniforms.frames.value = textures;
 	                this._material.uniforms.frames.needsUpdate = true;
@@ -33756,18 +33676,25 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var THREE = __webpack_require__(215);
+	exports.arraySize = undefined;
+
+	var _three = __webpack_require__(215);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	var _gen_array = __webpack_require__(223);
+
+	var _gen_array2 = _interopRequireDefault(_gen_array);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var arraySize = exports.arraySize = 12;
 
-	var emptyTextureArray = [];
-	for (var i = 0; i < arraySize; ++i) {
-	    emptyTextureArray.push(new THREE.Texture());
-	}
+	var emptyTextureArray = (0, _gen_array2.default)(arraySize, new _three2.default.Texture());
 
 	exports.default = {
 	    uniforms: {
-	        sourceTexture: { type: 't', value: new THREE.Texture() },
+	        sourceTexture: { type: 't', value: new _three2.default.Texture() },
 
 	        frames: { type: 'tv', value: emptyTextureArray },
 	        frameWeight: { type: 'f', value: 1.0 / arraySize }
@@ -33780,12 +33707,17 @@
 /* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	var THREE = __webpack_require__(215);
+
+	var _three = __webpack_require__(215);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = {
 	    uniforms: {
@@ -35442,6 +35374,27 @@
 	}
 
 	module.exports = LZWEncoder;
+
+/***/ },
+/* 223 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 * Generate an array of `x` repeated `arraySize` times
+	 */
+
+	exports.default = function (arraySize, x) {
+	    var out = [];
+	    for (var i = 0; i < arraySize; ++i) {
+	        out.push(x);
+	    }
+	    return out;
+	};
 
 /***/ }
 /******/ ]);

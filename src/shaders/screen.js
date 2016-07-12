@@ -1,5 +1,4 @@
-"use strict";
-const THREE = require('three');
+import THREE from 'three';
 
 export default {
     uniforms: {

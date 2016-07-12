@@ -109,7 +109,7 @@ export default class GifPlayer extends React.Component {
 
         const start = Date.now();
         setTimeout(() => {
-            if (!this.props.imageData || this.props.imageData !== imageData || this.props.mode === 'median')
+            if (!this.props.imageData || this.props.imageData !== imageData)
                 return;
 
             let nextFrame = (this.state.currentFrame + 1);
@@ -154,7 +154,7 @@ export default class GifPlayer extends React.Component {
                 <div>
                     <LoadingSpinner active={this.props.loadingGif} />
                 </div>
-                <div className={"playback-controls content-wrapper " + (this.props.mode === 'median' ? 'hidden' : '')}>
+                <div className={"playback-controls content-wrapper "}>
                     <LabeledSlider className="playback-tracker"
                         min="0"
                         max={this.getNumFrames() - 1}

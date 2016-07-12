@@ -1,11 +1,9 @@
-const THREE = require('three');
+import THREE from 'three';
+import gen from '../gen_array';
 
 export const arraySize = 12;
 
-const emptyTextureArray = [];
-for (let i = 0; i < arraySize; ++i) {
-    emptyTextureArray.push(new THREE.Texture());
-}
+const emptyTextureArray = gen(arraySize, new THREE.Texture());
 
 export default {
     uniforms: {
