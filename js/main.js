@@ -28735,9 +28735,9 @@
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'full-width' },
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Number of Frames to Sample',
+	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Sample Frames',
 	                                min: '1',
-	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
+	                                max: this.state.imageData ? this.state.imageData.frames.length : 0,
 	                                value: this.state.numberOfFramesToSample,
 	                                onChange: this.onNumberOfFramesToSampleChanged.bind(this) })
 	                        ),
@@ -30285,10 +30285,6 @@
 	        key: 'setOptions',
 	        value: function setOptions(options) {
 	            this._options = options;
-
-	            this._material.uniforms.frameWeight.value = 1.0 / this._options.numberOfFramesToSample;
-	            this._material.uniforms.frameWeight.needsUpdate = true;
-
 	            this.render();
 	        }
 	    }, {
@@ -30322,24 +30318,29 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return this.renderToScreen(this.renderMedian(this._options.numberOfFramesToSample));
+	            return this.renderToScreen(this.renderMedian(this._options.currentFrame, this._options.frameIncrement, this._options.numberOfFramesToSample, this._options.wrapMode));
 	        }
 	    }, {
 	        key: 'renderMedian',
-	        value: function renderMedian(numberOfFramesToSample) {
+	        value: function renderMedian(initialFrame, frameIncrement, numberOfFramesToSample, wrapMode) {
 	            var source = emptyTexture;
 	            var dest = this._rtTexture1;
 
 	            var remaining = numberOfFramesToSample;
 	            for (var startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
 	                var textures = (0, _gen_array2.default)(median_shader_config.arraySize, emptyTexture);
+	                var weights = (0, _gen_array2.default)(median_shader_config.arraySize, 0);
 
 	                for (var i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-	                    var tex = this._frames[(this._options.currentFrame + startFrame + i) % this._frames.length];
+	                    var tex = this._frames[(initialFrame + (startFrame + i) * frameIncrement) % this._frames.length];
 	                    textures[i] = tex;
+	                    weights[i] = 1.0 / this._options.numberOfFramesToSample;
 	                }
 	                this._material.uniforms.frames.value = textures;
 	                this._material.uniforms.frames.needsUpdate = true;
+
+	                this._material.uniforms.frameWeights.value = weights;
+	                this._material.uniforms.frameWeights.needsUpdate = true;
 
 	                this._material.uniforms.sourceTexture.value = source;
 	                this._material.uniforms.sourceTexture.needsUpdate = true;
@@ -30349,7 +30350,7 @@
 	                source = dest;
 	                dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1;
 	            }
-	            return source;
+	            return source.texture || source;
 	        }
 	    }]);
 
@@ -33668,17 +33669,15 @@
 
 	var arraySize = exports.arraySize = 12;
 
-	var emptyTextureArray = (0, _gen_array2.default)(arraySize, new _three2.default.Texture());
-
 	exports.default = {
 	    uniforms: {
 	        sourceTexture: { type: 't', value: new _three2.default.Texture() },
 
-	        frames: { type: 'tv', value: emptyTextureArray },
-	        frameWeight: { type: 'f', value: 1.0 / arraySize }
+	        frames: { type: 'tv', value: (0, _gen_array2.default)(arraySize, new _three2.default.Texture()) },
+	        frameWeights: { type: 'fv', value: (0, _gen_array2.default)(arraySize, 1.0 / arraySize) }
 	    },
 	    vertexShader: '\n        varying vec2 vUv;\n        \n        void main() {\n            vUv = uv;\n            gl_Position = vec4(position, 1.0);\n        }\n    ',
-	    fragmentShader: '\n        uniform sampler2D sourceTexture;\n\n        uniform sampler2D frames[' + arraySize + '];\n        uniform float frameWeight;\n\n        varying vec2 vUv;\n        \n        void main() {\n            vec4 sum = texture2D(sourceTexture, vUv);\n            for(int i = 0; i < ' + arraySize + '; ++i) {\n                sum += texture2D(frames[i], vUv) * frameWeight;\n            }\n            gl_FragColor = vec4(sum.xyz, 1.0);\n        }\n    '
+	    fragmentShader: '\n        uniform sampler2D sourceTexture;\n\n        uniform sampler2D frames[' + arraySize + '];\n        uniform float frameWeights[' + arraySize + '];\n\n        varying vec2 vUv;\n        \n        void main() {\n            vec4 sum = texture2D(sourceTexture, vUv);\n            for(int i = 0; i < ' + arraySize + '; ++i) {\n                sum += texture2D(frames[i], vUv) * frameWeights[i];\n            }\n            gl_FragColor = vec4(sum.xyz, 1.0);\n        }\n    '
 	};
 
 /***/ },

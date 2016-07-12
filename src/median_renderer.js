@@ -56,10 +56,6 @@ export default class MedianRenderer {
 
     setOptions(options) {
         this._options = options;
-
-        this._material.uniforms.frameWeight.value = 1.0 / (this._options.numberOfFramesToSample);
-        this._material.uniforms.frameWeight.needsUpdate = true;
-
         this.render();
     }
 
@@ -92,32 +88,41 @@ export default class MedianRenderer {
     }
 
     render() {
-        return this.renderToScreen(this.renderMedian(this._options.numberOfFramesToSample));
+        return this.renderToScreen(this.renderMedian(
+            this._options.currentFrame,
+            this._options.frameIncrement,
+            this._options.numberOfFramesToSample,
+            this._options.wrapMode));
     }
 
-    renderMedian(numberOfFramesToSample) {
+    renderMedian(initialFrame, frameIncrement, numberOfFramesToSample, wrapMode) {
         let source = emptyTexture;
         let dest = this._rtTexture1;
 
         const remaining = numberOfFramesToSample;
         for (let startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
             const textures = gen_array(median_shader_config.arraySize, emptyTexture);
+            const weights = gen_array(median_shader_config.arraySize, 0);
 
             for (let i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-                const tex = this._frames[(this._options.currentFrame + startFrame + i) % this._frames.length];
+                const tex = this._frames[(initialFrame + (startFrame + i) * frameIncrement) % this._frames.length];
                 textures[i] = tex;
+                weights[i] = 1.0 / (this._options.numberOfFramesToSample);
             }
             this._material.uniforms.frames.value = textures
             this._material.uniforms.frames.needsUpdate = true;
 
+            this._material.uniforms.frameWeights.value = weights;
+            this._material.uniforms.frameWeights.needsUpdate = true;
+
             this._material.uniforms.sourceTexture.value = source
             this._material.uniforms.sourceTexture.needsUpdate = true;
-            
+
             this._renderer.render(this._sceneRTT, this._camera, dest, true);
 
             source = dest;
-            dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1; 
+            dest = (dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1); 
         }
-        return source;
+        return source.texture || source;
     }
 }

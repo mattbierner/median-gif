@@ -179,9 +179,9 @@ export default class Viewer extends React.Component {
                                 onChange={this.onInitialFrameChange.bind(this) }/>
                         </div>
                         <div className="full-width">
-                            <LabeledSlider title='Number of Frames to Sample'
+                            <LabeledSlider title='Sample Frames'
                                 min="1"
-                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
+                                max={this.state.imageData ? this.state.imageData.frames.length : 0}
                                 value={this.state.numberOfFramesToSample}
                                 onChange={this.onNumberOfFramesToSampleChanged.bind(this) }/>
                         </div>
