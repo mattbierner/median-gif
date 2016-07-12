@@ -52,12 +52,6 @@ export default class MedianRenderer {
         if (options) {
            this.setOptions(options);
         }
-        this.setCurrentFrame(0);
-    }
-
-    setCurrentFrame(frame) {
-        this._currentFrame = frame;
-        this.animate();
     }
 
     setOptions(options) {
@@ -66,7 +60,7 @@ export default class MedianRenderer {
         this._material.uniforms.frameWeight.value = 1.0 / (this._options.numberOfFramesToSample);
         this._material.uniforms.frameWeight.needsUpdate = true;
 
-        this.animate();
+        this.render();
     }
 
     resize(width, height) {
@@ -88,17 +82,7 @@ export default class MedianRenderer {
         this._renderer.setSize(width, height);
     }
 
-    /**
-     * Main update function.
-     */
-    update() {
-       this._currentFrame++;
-    }
 
-    animate() {
-        this.update();
-        this.render();
-    }
 
     renderToScreen(source) {
         this._materialScreen.uniforms.tDiffuse.value = source;
@@ -107,11 +91,8 @@ export default class MedianRenderer {
         this._renderer.render(this._scene, this._camera);
     }
 
-    render(delta) {
-        switch (this._options.mode) {
-        case 'median':
-            return this.renderToScreen(this.renderMedian(this._options.numberOfFramesToSample));
-        }
+    render() {
+        return this.renderToScreen(this.renderMedian(this._options.numberOfFramesToSample));
     }
 
     renderMedian(numberOfFramesToSample) {
@@ -123,7 +104,7 @@ export default class MedianRenderer {
             const textures = gen_array(median_shader_config.arraySize, emptyTexture);
 
             for (let i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-                const tex = this._frames[(this._currentFrame + startFrame + i) % this._frames.length];
+                const tex = this._frames[(this._options.currentFrame + startFrame + i) % this._frames.length];
                 textures[i] = tex;
             }
             this._material.uniforms.frames.value = textures

@@ -20,10 +20,6 @@ export default class GifRenderer extends React.Component {
         if (this.props.imageData !== newProps.imageData) {
             this._renderer.setGif(newProps.imageData);
         }
-        if (this.props.currentFrame !== newProps.currentFrame) {
-            this._renderer.setCurrentFrame(newProps.currentFrame);
-        }
-
         this._renderer.setOptions(newProps);
     }
 

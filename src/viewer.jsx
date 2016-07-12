@@ -8,29 +8,37 @@ import GifPlayer from './gif_player';
 import exportGif from './gif_export';
 
 /**
- * Display modes
+ * Wrapping mode for frame selections
  */
-const modes = {
-    'median': {
-        title: 'Median Blend',
-        description: 'Blends frames of the animation with equal weight.'
+const wrapModes = {
+    'overflow': {
+        title: 'Overflow',
+        description: 'overflow'
     },
+    'end': {
+        title: 'End',
+        description: 'end'
+    },
+    'stop': {
+        title: 'Stop',
+        description: 'stop'
+    }
 };
 
 /**
- * Control for selecting rendering mode.
+ * Control for selecting wrapping mode.
  */
-class ModeSelector extends React.Component {
+class WrapModeSelector extends React.Component {
     render() {
-        const modeOptions = Object.keys(modes).map(x =>
-            <option value={x} key={x}>{modes[x].title}</option>);
+        const modeOptions = Object.keys(wrapModes).map(x =>
+            <option value={x} key={x}>{wrapModes[x].title}</option>);
         return (
             <div className="mode-selector control-group">
-                <span className="control-title">Mode </span>
+                <span className="control-title">Wrap Mode </span>
                 <select value={this.props.value} onChange={this.props.onChange }>
                     {modeOptions}
                 </select>
-                <div className="control-description">{modes[this.props.value].description}</div>
+                <div className="control-description">{wrapModes[this.props.value].description}</div>
             </div>
         );
     }
@@ -45,7 +53,6 @@ export default class Viewer extends React.Component {
         this.state = {
             imageData: null,
             loadingGif: false,
-            mode: Object.keys(modes)[0],
             exporting: false,
 
             // playback
@@ -56,6 +63,7 @@ export default class Viewer extends React.Component {
             playbackSpeed: 1,
 
             // median
+            wrapMode: Object.keys(wrapModes)[0],
             numberOfFramesToSample: 1
 
         };
@@ -107,9 +115,9 @@ export default class Viewer extends React.Component {
             });
     }
 
-    onModeChange(e) {
+    onWrapModeChange(e) {
         const value = e.target.value;
-        this.setState({ mode: value });
+        this.setState({ wrapMode: value });
     }
 
     onReverseFrameOrderChange(e) {
@@ -153,7 +161,7 @@ export default class Viewer extends React.Component {
                     <GifPlayer {...this.state} />
                 </div>
                 <div className="view-controls">
-                    <ModeSelector value={this.state.mode} onChange={this.onModeChange.bind(this) } />
+                    <WrapModeSelector value={this.state.wrapMode} onChange={this.onWrapModeChange.bind(this) } />
 
                     <div className="frame-controls">
                         <div className="full-width">

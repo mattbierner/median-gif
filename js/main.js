@@ -28503,36 +28503,44 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	/**
-	 * Display modes
+	 * Wrapping mode for frame selections
 	 */
-	var modes = {
-	    'median': {
-	        title: 'Median Blend',
-	        description: 'Blends frames of the animation with equal weight.'
+	var wrapModes = {
+	    'overflow': {
+	        title: 'Overflow',
+	        description: 'overflow'
+	    },
+	    'end': {
+	        title: 'End',
+	        description: 'end'
+	    },
+	    'stop': {
+	        title: 'Stop',
+	        description: 'stop'
 	    }
 	};
 
 	/**
-	 * Control for selecting rendering mode.
+	 * Control for selecting wrapping mode.
 	 */
 
-	var ModeSelector = function (_React$Component) {
-	    _inherits(ModeSelector, _React$Component);
+	var WrapModeSelector = function (_React$Component) {
+	    _inherits(WrapModeSelector, _React$Component);
 
-	    function ModeSelector() {
-	        _classCallCheck(this, ModeSelector);
+	    function WrapModeSelector() {
+	        _classCallCheck(this, WrapModeSelector);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(ModeSelector).apply(this, arguments));
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(WrapModeSelector).apply(this, arguments));
 	    }
 
-	    _createClass(ModeSelector, [{
+	    _createClass(WrapModeSelector, [{
 	        key: 'render',
 	        value: function render() {
-	            var modeOptions = Object.keys(modes).map(function (x) {
+	            var modeOptions = Object.keys(wrapModes).map(function (x) {
 	                return _react2.default.createElement(
 	                    'option',
 	                    { value: x, key: x },
-	                    modes[x].title
+	                    wrapModes[x].title
 	                );
 	            });
 	            return _react2.default.createElement(
@@ -28541,7 +28549,7 @@
 	                _react2.default.createElement(
 	                    'span',
 	                    { className: 'control-title' },
-	                    'Mode '
+	                    'Wrap Mode '
 	                ),
 	                _react2.default.createElement(
 	                    'select',
@@ -28551,13 +28559,13 @@
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'control-description' },
-	                    modes[this.props.value].description
+	                    wrapModes[this.props.value].description
 	                )
 	            );
 	        }
 	    }]);
 
-	    return ModeSelector;
+	    return WrapModeSelector;
 	}(_react2.default.Component);
 
 	/**
@@ -28576,7 +28584,6 @@
 	        _this2.state = {
 	            imageData: null,
 	            loadingGif: false,
-	            mode: Object.keys(modes)[0],
 	            exporting: false,
 
 	            // playback
@@ -28587,6 +28594,7 @@
 	            playbackSpeed: 1,
 
 	            // median
+	            wrapMode: Object.keys(wrapModes)[0],
 	            numberOfFramesToSample: 1
 
 	        };
@@ -28641,10 +28649,10 @@
 	            });
 	        }
 	    }, {
-	        key: 'onModeChange',
-	        value: function onModeChange(e) {
+	        key: 'onWrapModeChange',
+	        value: function onWrapModeChange(e) {
 	            var value = e.target.value;
-	            this.setState({ mode: value });
+	            this.setState({ wrapMode: value });
 	        }
 	    }, {
 	        key: 'onReverseFrameOrderChange',
@@ -28702,7 +28710,7 @@
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'view-controls' },
-	                    _react2.default.createElement(ModeSelector, { value: this.state.mode, onChange: this.onModeChange.bind(this) }),
+	                    _react2.default.createElement(WrapModeSelector, { value: this.state.wrapMode, onChange: this.onWrapModeChange.bind(this) }),
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'frame-controls' },
@@ -30147,10 +30155,6 @@
 	            if (this.props.imageData !== newProps.imageData) {
 	                this._renderer.setGif(newProps.imageData);
 	            }
-	            if (this.props.currentFrame !== newProps.currentFrame) {
-	                this._renderer.setCurrentFrame(newProps.currentFrame);
-	            }
-
 	            this._renderer.setOptions(newProps);
 	        }
 	    }, {
@@ -30276,13 +30280,6 @@
 	            if (options) {
 	                this.setOptions(options);
 	            }
-	            this.setCurrentFrame(0);
-	        }
-	    }, {
-	        key: 'setCurrentFrame',
-	        value: function setCurrentFrame(frame) {
-	            this._currentFrame = frame;
-	            this.animate();
 	        }
 	    }, {
 	        key: 'setOptions',
@@ -30292,7 +30289,7 @@
 	            this._material.uniforms.frameWeight.value = 1.0 / this._options.numberOfFramesToSample;
 	            this._material.uniforms.frameWeight.needsUpdate = true;
 
-	            this.animate();
+	            this.render();
 	        }
 	    }, {
 	        key: 'resize',
@@ -30314,22 +30311,6 @@
 
 	            this._renderer.setSize(width, height);
 	        }
-
-	        /**
-	         * Main update function.
-	         */
-
-	    }, {
-	        key: 'update',
-	        value: function update() {
-	            this._currentFrame++;
-	        }
-	    }, {
-	        key: 'animate',
-	        value: function animate() {
-	            this.update();
-	            this.render();
-	        }
 	    }, {
 	        key: 'renderToScreen',
 	        value: function renderToScreen(source) {
@@ -30340,11 +30321,8 @@
 	        }
 	    }, {
 	        key: 'render',
-	        value: function render(delta) {
-	            switch (this._options.mode) {
-	                case 'median':
-	                    return this.renderToScreen(this.renderMedian(this._options.numberOfFramesToSample));
-	            }
+	        value: function render() {
+	            return this.renderToScreen(this.renderMedian(this._options.numberOfFramesToSample));
 	        }
 	    }, {
 	        key: 'renderMedian',
@@ -30357,7 +30335,7 @@
 	                var textures = (0, _gen_array2.default)(median_shader_config.arraySize, emptyTexture);
 
 	                for (var i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-	                    var tex = this._frames[(this._currentFrame + startFrame + i) % this._frames.length];
+	                    var tex = this._frames[(this._options.currentFrame + startFrame + i) % this._frames.length];
 	                    textures[i] = tex;
 	                }
 	                this._material.uniforms.frames.value = textures;
