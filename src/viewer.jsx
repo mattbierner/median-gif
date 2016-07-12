@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import loadGif from './loadGif';
+import LabeledSelector from './labeled_selector';
 import LabeledSlider from './labeled_slider';
 import LoadingSpinner from './loading_spinner';
 import GifPlayer from './gif_player';
@@ -30,16 +31,8 @@ const wrapModes = {
  */
 class WrapModeSelector extends React.Component {
     render() {
-        const modeOptions = Object.keys(wrapModes).map(x =>
-            <option value={x} key={x}>{wrapModes[x].title}</option>);
         return (
-            <div className="mode-selector control-group">
-                <span className="control-title">Wrap Mode </span>
-                <select value={this.props.value} onChange={this.props.onChange }>
-                    {modeOptions}
-                </select>
-                <div className="control-description">{wrapModes[this.props.value].description}</div>
-            </div>
+            <LabeledSelector {...this.props} title="Wrap Mode" options={wrapModes} />
         );
     }
 }
