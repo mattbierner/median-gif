@@ -78,17 +78,11 @@ export default class MedianRenderer {
         this._renderer.setSize(width, height);
     }
 
-
-
-    renderToScreen(source) {
-        this._materialScreen.uniforms.tDiffuse.value = source;
-        this._materialScreen.uniforms.tDiffuse.needsUpdate = true;
-
-        this._renderer.render(this._scene, this._camera);
-    }
-
+    /**
+     * Main render function.
+     */
     render() {
-        return this.renderToScreen(this.renderMedian(
+        return this.renderToScreen(this.renderMedian(source,
             this._options.currentFrame,
             this._options.frameIncrement,
             this._options.sampleMode,
@@ -96,8 +90,20 @@ export default class MedianRenderer {
             this._options.wrapMode));
     }
 
-    renderMedian(initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
-        let source = emptyTexture;
+    /**
+     * Renders `texture` to the screen.
+     */
+    renderToScreen(texture) {
+        this._materialScreen.uniforms.tDiffuse.value = texture;
+        this._materialScreen.uniforms.tDiffuse.needsUpdate = true;
+
+        this._renderer.render(this._scene, this._camera);
+    }
+
+    /**
+     * Render for median blending. Renders to a texture.
+     */
+    renderMedian(source, initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
         let dest = this._rtTexture1;
 
         const mul = sampleMode === 'reverse' ? -1 : 1
@@ -112,23 +118,33 @@ export default class MedianRenderer {
                 textures[i] = tex;
                 weights[i] = weight;
             }
-            this._material.uniforms.frames.value = textures
-            this._material.uniforms.frames.needsUpdate = true;
-
-            this._material.uniforms.frameWeights.value = weights;
-            this._material.uniforms.frameWeights.needsUpdate = true;
-
-            this._material.uniforms.sourceTexture.value = source
-            this._material.uniforms.sourceTexture.needsUpdate = true;
-
-            this._renderer.render(this._sceneRTT, this._camera, dest, true);
-
-            source = dest;
+            
+            source = this.renderGifFrames(textures, weights, source, dest);
             dest = (dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1); 
         }
         return source.texture || source;
     }
 
+    /**
+     * Renders a number of gif frames to a texture.
+     */
+    renderGifFrames(frames, weights, source, dest) {
+        this._material.uniforms.frames.value = frames
+        this._material.uniforms.frames.needsUpdate = true;
+
+        this._material.uniforms.frameWeights.value = weights;
+        this._material.uniforms.frameWeights.needsUpdate = true;
+
+        this._material.uniforms.sourceTexture.value = source
+        this._material.uniforms.sourceTexture.needsUpdate = true;
+
+        this._renderer.render(this._sceneRTT, this._camera, dest, true);
+        return dest;
+    }
+
+    /**
+     * Get the frame and frameWeight of a frame for a given index in the gif.
+     */
     getFrame(index, wrapMode) {
         switch (wrapMode) {
         case 'clamp':
@@ -137,6 +153,7 @@ export default class MedianRenderer {
             const weight = 1.0 / (this._options.numberOfFramesToSample);
             return [tex, weight];
         }
+
         case 'stop':
         {
             if (tex < 0 || tex > this._frames.length) {
