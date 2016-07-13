@@ -1,7 +1,19 @@
 import THREE from 'three';
 import gen from '../gen_array';
 
-export const arraySize = 12;
+// Lookup the maximum number of textures allowed in a fragment shader.
+// We reserve one for the accumulation buffer. 8 is the min.
+let arraySizeValue = 6;
+try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl');
+
+    arraySizeValue = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
+} catch (e) {
+    arraySizeValue = 6;
+}
+
+export const arraySize = arraySizeValue;
 
 export default {
     uniforms: {

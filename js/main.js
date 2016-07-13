@@ -30414,11 +30414,10 @@
 	        key: 'initRenderer',
 	        value: function initRenderer(canvas) {
 	            this._renderer = new _three2.default.WebGLRenderer({
-	                canvas: canvas,
-	                preserveDrawingBuffer: true
+	                canvas: canvas
 	            });
 	            this._renderer.setClearColor(0xffffff, 0);
-	            this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+	            //  this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
 	        }
 	    }, {
 	        key: 'initMaterials',
@@ -34016,7 +34015,19 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var arraySize = exports.arraySize = 12;
+	// Lookup the maximum number of textures allowed in a fragment shader.
+	// We reserve one for the accumulation buffer. 8 is the min.
+	var arraySizeValue = 6;
+	try {
+	    var canvas = document.createElement('canvas');
+	    var gl = canvas.getContext('webgl');
+
+	    arraySizeValue = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
+	} catch (e) {
+	    arraySizeValue = 6;
+	}
+
+	var arraySize = exports.arraySize = arraySizeValue;
 
 	exports.default = {
 	    uniforms: {

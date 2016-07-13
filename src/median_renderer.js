@@ -25,11 +25,10 @@ export default class MedianRenderer {
 
     initRenderer(canvas) {
         this._renderer = new THREE.WebGLRenderer({
-            canvas: canvas,
-            preserveDrawingBuffer: true
+            canvas: canvas
         });
         this._renderer.setClearColor(0xffffff, 0);
-        this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+      //  this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
     }
 
     initMaterials() {
