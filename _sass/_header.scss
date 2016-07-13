@@ -1,17 +1,19 @@
 
 #site-header {
     text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     
-    height: 260px;
     padding-bottom: 4em;
     color: $brand-color;
 
     #site-title {
         display: block;
         padding: 0 1rem;
+        margin-top: 2rem;
+        height: auto;
+        max-width: 100%;
     }
 
     .links a {
@@ -20,12 +22,18 @@
     }
 }
 
+@media only screen and (max-width: 800px) {
+    #site-header {
+        padding-bottom: 2em;
+    }
+}
+
 @media only screen and (max-width: 500px) {
     #site-header {
+        padding-bottom: 1.4em;
+
         #site-title {
-            font-size: 28px;
-            letter-spacing: 8px;
-            margin-right: -8px;
+            margin-top: 1rem;
         }
     }
 }

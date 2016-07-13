@@ -28,7 +28,7 @@ export default class MedianRenderer {
             canvas: canvas
         });
         this._renderer.setClearColor(0xffffff, 0);
-      //  this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+        this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
     }
 
     initMaterials() {
