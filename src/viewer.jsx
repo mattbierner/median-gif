@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 import loadGif from './loadGif';
 import LabeledSelector from './components/labeled_selector';
 import LabeledSlider from './components/labeled_slider';
+import LabeledNumberInput from './components/labeled_number_input';
 import LoadingSpinner from './components/loading_spinner';
+
 import GifPlayer from './gif_player';
 import exportGif from './gif_export';
 
@@ -18,7 +20,7 @@ import wrapModes from './options/wrap_modes';
 class WrapModeSelector extends React.Component {
     render() {
         return (
-            <LabeledSelector {...this.props} title="Wrap Mode" options={wrapModes} />
+            <LabeledSelector {...this.props} title="Wrapping" options={wrapModes} />
         );
     }
 }
@@ -29,7 +31,7 @@ class WrapModeSelector extends React.Component {
 class WeightModeSelector extends React.Component {
     render() {
         return (
-            <LabeledSelector {...this.props} title="Weight Mode" options={weightModes} />
+            <LabeledSelector {...this.props} title="Frame Weights" options={weightModes} />
         );
     }
 }
@@ -40,7 +42,7 @@ class WeightModeSelector extends React.Component {
 class SampleModeSelector extends React.Component {
     render() {
         return (
-            <LabeledSelector {...this.props} title="Sample Mode" options={sampleModes} />
+            <LabeledSelector {...this.props} title="Sample Direction" options={sampleModes} />
         );
     }
 }
@@ -68,7 +70,7 @@ class WeightOptions extends React.Component {
         const value = e.target.value;
         const update = { weightMode: value };
         this.setState(update);
-        this.onUpdate(Object.assign({}, this.state,update));
+        this.onUpdate(Object.assign({}, this.state, update));
     }
 
     onUpdate(state) {
@@ -78,35 +80,21 @@ class WeightOptions extends React.Component {
 
     getWeightFunction(state) {
         switch (state.weightMode) {
-        case 'exponential':
-            return (i) => Math.exp(-this.state.exponentialScale * i);
-        
-        case 'equal':
-        default:
-            return () => 1;
+            case 'exponential':
+                return (i) => Math.exp(-this.state.exponentialScale * i);
+
+            case 'equal':
+            default:
+                return () => 1;
         }
     }
 
-    onExponentialScaleChange(e) {
-        const value = e.target.value;
-        if (isNaN(value)) {
-            this.setState({exponentialScale: value });
-            return;
-        }
-        const update = { exponentialScale: value }
-        this.setState(update);
-        this.onUpdate(Object.assign({}, this.state, update));
+    onExponentialScaleChange(value) {
+        this.setState({ exponentialScale: value });
     }
 
-    onExponentialInitialChange(e) {
-        const value = e.target.value;
-        if (isNaN(value)) {
-            this.setState({exponentialInitial: value });
-            return;
-        }
-        const update = { exponentialInitial: value }
-        this.setState(update);
-        this.onUpdate(Object.assign({}, this.state, update));
+    onExponentialInitialChange(value) {
+        this.setState({ exponentialInitial: value });
     }
 
     render() {
@@ -116,9 +104,11 @@ class WeightOptions extends React.Component {
                     <WeightModeSelector value={this.state.weightMode} onChange={this.onWeightModeChange.bind(this) } />
                 </div>
 
-                <input type="number" step="0.01" value={this.state.exponentialInitial} onChange={this.onExponentialInitialChange.bind(this)}/>
-
-                <input type="number" step="0.01" value={this.state.exponentialScale} onChange={this.onExponentialScaleChange.bind(this)}/>
+                <div className={'full-width ' + (this.state.weightMode === 'exponential' ? '' : 'hidden')}>
+                    <LabeledNumberInput
+                        title="Decay Rate"
+                        value={this.state.exponentialScale} onChange={x => this.setState({exponentialScale: x}) }/>
+                </div>
             </div>
         );
     }
@@ -252,22 +242,21 @@ export default class Viewer extends React.Component {
                         </div>
                     </div>
 
-                    <WeightOptions onWeightFunctionChange={this.onWeightFunctionChange.bind(this) } />
-
-                     <div className="full-width">
-                        <LabeledSlider title='Frame Increment'
-                            min="1"
-                            max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
-                            value={this.state.frameIncrement}
-                            onChange={this.onFrameIncrementChange.bind(this) }/>
-                    </div>
-
                     <div className="frame-controls">
                         <div className="full-width">
                             <WrapModeSelector value={this.state.wrapMode} onChange={this.onWrapModeChange.bind(this) } />
                         </div>
-
+                        <div className="full-width">
+                            <LabeledSlider title='Frame Increment'
+                                min="1"
+                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
+                                value={this.state.frameIncrement}
+                                onChange={this.onFrameIncrementChange.bind(this) }/>
+                        </div>
                     </div>
+
+                    <WeightOptions onWeightFunctionChange={this.onWeightFunctionChange.bind(this) } />
+
 
                     <div className="export-controls">
                         <button onClick={this.onExport.bind(this) }>Export to gif</button>

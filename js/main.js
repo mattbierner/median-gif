@@ -28436,6 +28436,10 @@
 
 	var _labeled_slider2 = _interopRequireDefault(_labeled_slider);
 
+	var _labeled_number_input = __webpack_require__(231);
+
+	var _labeled_number_input2 = _interopRequireDefault(_labeled_number_input);
+
 	var _loading_spinner = __webpack_require__(230);
 
 	var _loading_spinner2 = _interopRequireDefault(_loading_spinner);
@@ -28484,7 +28488,7 @@
 	    _createClass(WrapModeSelector, [{
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Wrap Mode', options: _wrap_modes2.default }));
+	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Wrapping', options: _wrap_modes2.default }));
 	        }
 	    }]);
 
@@ -28508,7 +28512,7 @@
 	    _createClass(WeightModeSelector, [{
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Weight Mode', options: _weight_modes2.default }));
+	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Frame Weights', options: _weight_modes2.default }));
 	        }
 	    }]);
 
@@ -28532,7 +28536,7 @@
 	    _createClass(SampleModeSelector, [{
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Sample Mode', options: _sample_modes2.default }));
+	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Sample Direction', options: _sample_modes2.default }));
 	        }
 	    }]);
 
@@ -28601,31 +28605,19 @@
 	        }
 	    }, {
 	        key: 'onExponentialScaleChange',
-	        value: function onExponentialScaleChange(e) {
-	            var value = e.target.value;
-	            if (isNaN(value)) {
-	                this.setState({ exponentialScale: value });
-	                return;
-	            }
-	            var update = { exponentialScale: value };
-	            this.setState(update);
-	            this.onUpdate(Object.assign({}, this.state, update));
+	        value: function onExponentialScaleChange(value) {
+	            this.setState({ exponentialScale: value });
 	        }
 	    }, {
 	        key: 'onExponentialInitialChange',
-	        value: function onExponentialInitialChange(e) {
-	            var value = e.target.value;
-	            if (isNaN(value)) {
-	                this.setState({ exponentialInitial: value });
-	                return;
-	            }
-	            var update = { exponentialInitial: value };
-	            this.setState(update);
-	            this.onUpdate(Object.assign({}, this.state, update));
+	        value: function onExponentialInitialChange(value) {
+	            this.setState({ exponentialInitial: value });
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var _this6 = this;
+
 	            return _react2.default.createElement(
 	                'div',
 	                { className: 'frame-controls' },
@@ -28634,8 +28626,15 @@
 	                    { className: 'full-width' },
 	                    _react2.default.createElement(WeightModeSelector, { value: this.state.weightMode, onChange: this.onWeightModeChange.bind(this) })
 	                ),
-	                _react2.default.createElement('input', { type: 'number', step: '0.01', value: this.state.exponentialInitial, onChange: this.onExponentialInitialChange.bind(this) }),
-	                _react2.default.createElement('input', { type: 'number', step: '0.01', value: this.state.exponentialScale, onChange: this.onExponentialScaleChange.bind(this) })
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'full-width ' + (this.state.weightMode === 'exponential' ? '' : 'hidden') },
+	                    _react2.default.createElement(_labeled_number_input2.default, {
+	                        title: 'Decay Rate',
+	                        value: this.state.exponentialScale, onChange: function onChange(x) {
+	                            return _this6.setState({ exponentialScale: x });
+	                        } })
+	                )
 	            );
 	        }
 	    }]);
@@ -28654,9 +28653,9 @@
 	    function Viewer(props) {
 	        _classCallCheck(this, Viewer);
 
-	        var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(Viewer).call(this, props));
+	        var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(Viewer).call(this, props));
 
-	        _this6.state = {
+	        _this7.state = {
 	            imageData: null,
 	            loadingGif: false,
 	            exporting: false,
@@ -28672,7 +28671,7 @@
 	            numberOfFramesToSample: 1,
 	            weightMode: Object.keys(_weight_modes2.default)[0]
 	        };
-	        return _this6;
+	        return _this7;
 	    }
 
 	    _createClass(Viewer, [{
@@ -28690,13 +28689,13 @@
 	    }, {
 	        key: 'loadGif',
 	        value: function loadGif(file) {
-	            var _this7 = this;
+	            var _this8 = this;
 
 	            this.setState({ loadingGif: true });
 	            (0, _loadGif3.default)(file).then(function (data) {
-	                if (file !== _this7.props.file) return;
+	                if (file !== _this8.props.file) return;
 
-	                _this7.setState({
+	                _this8.setState({
 	                    imageData: data,
 	                    loadingGif: false,
 	                    error: null,
@@ -28709,10 +28708,10 @@
 	                    numberOfFramesToSample: Math.ceil(data.frames.length / 2)
 	                });
 	            }).catch(function (e) {
-	                if (file !== _this7.props.file) return;
+	                if (file !== _this8.props.file) return;
 
 	                console.error(e);
-	                _this7.setState({
+	                _this8.setState({
 	                    imageData: [],
 	                    loadingGif: false,
 	                    error: 'Could not load gif'
@@ -28746,13 +28745,13 @@
 	    }, {
 	        key: 'onExport',
 	        value: function onExport() {
-	            var _this8 = this;
+	            var _this9 = this;
 
 	            if (!this._renderer) return;
 
 	            this.setState({ exporting: true });
 	            (0, _gif_export2.default)(this.state.imageData, this._renderer, this.state).then(function (blob) {
-	                _this8.setState({ exporting: false });
+	                _this9.setState({ exporting: false });
 	                var url = URL.createObjectURL(blob);
 	                window.open(url);
 	            });
@@ -28799,16 +28798,6 @@
 	                                onChange: this.onNumberOfFramesToSampleChanged.bind(this) })
 	                        )
 	                    ),
-	                    _react2.default.createElement(WeightOptions, { onWeightFunctionChange: this.onWeightFunctionChange.bind(this) }),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'full-width' },
-	                        _react2.default.createElement(_labeled_slider2.default, { title: 'Frame Increment',
-	                            min: '1',
-	                            max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
-	                            value: this.state.frameIncrement,
-	                            onChange: this.onFrameIncrementChange.bind(this) })
-	                    ),
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'frame-controls' },
@@ -28816,8 +28805,18 @@
 	                            'div',
 	                            { className: 'full-width' },
 	                            _react2.default.createElement(WrapModeSelector, { value: this.state.wrapMode, onChange: this.onWrapModeChange.bind(this) })
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'full-width' },
+	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Frame Increment',
+	                                min: '1',
+	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
+	                                value: this.state.frameIncrement,
+	                                onChange: this.onFrameIncrementChange.bind(this) })
 	                        )
 	                    ),
+	                    _react2.default.createElement(WeightOptions, { onWeightFunctionChange: this.onWeightFunctionChange.bind(this) }),
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'export-controls' },
@@ -30378,7 +30377,8 @@
 
 	            var totalWeight = 0;
 	            for (var i = 0; i < numberOfFramesToSample; ++i) {
-	                totalWeight += weightFunction(i, numberOfFramesToSample);
+	                var weight = weightFunction(i, numberOfFramesToSample);
+	                totalWeight += weight;
 	            }
 	            var getWeight = function getWeight(i) {
 	                return weightFunction(i, numberOfFramesToSample) / totalWeight;
@@ -30397,10 +30397,10 @@
 	                    var _getFrame2 = _slicedToArray(_getFrame, 2);
 
 	                    var tex = _getFrame2[0];
-	                    var weight = _getFrame2[1];
+	                    var _weight = _getFrame2[1];
 
 	                    textures[_i] = tex;
-	                    weights[_i] = weight * mul;
+	                    weights[_i] = _weight * mul;
 	                }
 
 	                source = this.renderGifFrames(textures, weights, source, dest);
@@ -35559,7 +35559,6 @@
 	        title: 'Equal',
 	        description: 'Every frame has equal weight'
 	    },
-
 	    'exponential': {
 	        title: 'Exponential',
 	        description: 'Weight of frames decays exponentially'
@@ -35813,6 +35812,79 @@
 	}(_react2.default.Component);
 
 	exports.default = LoadingSpinner;
+
+/***/ },
+/* 231 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(33);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * Generic number input
+	 */
+
+	var LabeledNumberInput = function (_React$Component) {
+	    _inherits(LabeledNumberInput, _React$Component);
+
+	    function LabeledNumberInput() {
+	        _classCallCheck(this, LabeledNumberInput);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(LabeledNumberInput).apply(this, arguments));
+	    }
+
+	    _createClass(LabeledNumberInput, [{
+	        key: 'onChange',
+	        value: function onChange(e) {
+	            this.props.onChange(e.target.value);
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'control-group number-input-control-group full-width' },
+	                _react2.default.createElement(
+	                    'span',
+	                    { className: 'control-title' },
+	                    this.props.title,
+	                    ': '
+	                ),
+	                _react2.default.createElement('input', { type: 'number', step: '0.01', value: this.props.value, onChange: this.onChange.bind(this) }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'control-description' },
+	                    this.props.description
+	                )
+	            );
+	        }
+	    }]);
+
+	    return LabeledNumberInput;
+	}(_react2.default.Component);
+
+	exports.default = LabeledNumberInput;
 
 /***/ }
 /******/ ]);

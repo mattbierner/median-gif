@@ -163,7 +163,8 @@ export default class MedianRenderer {
 
         let totalWeight = 0;
         for (let i = 0; i < numberOfFramesToSample; ++i) {
-            totalWeight += weightFunction(i, numberOfFramesToSample);
+            const weight = weightFunction(i, numberOfFramesToSample);
+            totalWeight += weight;
         }
         const getWeight = (i) => weightFunction(i, numberOfFramesToSample) / totalWeight;
     
