@@ -9,7 +9,7 @@ import GifPlayer from './gif_player';
 import exportGif from './gif_export';
 
 /**
- * Wrapping mode for frame selections
+ * Wrapping mode for frame selections.
  */
 const wrapModes = {
     'overflow': {
@@ -38,6 +38,24 @@ class WrapModeSelector extends React.Component {
 }
 
 /**
+ * 
+ */
+const weightModes = {
+    'equal': {
+        title: 'Equal',
+        description: 'equal'
+    },
+};
+
+class WeightModeSelector extends React.Component {
+    render() {
+        return (
+            <LabeledSelector {...this.props} title="Weight Mode" options={weightModes} />
+        );
+    }
+}
+
+/**
  * Wrapping mode for frame selections
  */
 const sampleModes = {
@@ -47,11 +65,11 @@ const sampleModes = {
     },
     'reverse': {
         title: 'Reverse',
-        description: 'Select frames before the current frame.'
+        description: 'Select frames before the current frame'
     },
     'bi': {
-        title: 'Bi-Dirrectional',
-        description: 'Select frames both before and after the current frame.'
+        title: 'Bi-Directional',
+        description: 'Select frames both before and after the current frame'
     }
 };
 
@@ -78,8 +96,6 @@ export default class Viewer extends React.Component {
             exporting: false,
 
             // playback
-            reverseFrameOrder: false,
-            bounceFrameOrder: false,
             initialFrame: 0,
             frameIncrement: 1,
             playbackSpeed: 1,
@@ -87,8 +103,8 @@ export default class Viewer extends React.Component {
             // median
             wrapMode: Object.keys(wrapModes)[0],
             sampleMode: Object.keys(sampleModes)[0],
-            numberOfFramesToSample: 1
-
+            numberOfFramesToSample: 1,
+            weightMode: Object.keys(weightModes)[0],
         };
     }
 
@@ -114,12 +130,9 @@ export default class Viewer extends React.Component {
                     loadingGif: false,
                     error: null,
 
-                    playbackSpeed: 1,
-                    reverseFrameOrder: false,
-                    bounceFrameOrder: false,
                     initialFrame: 0,
-
                     frameIncrement: 1,
+                    playbackSpeed: 1,
 
                     // median
                     numberOfFramesToSample: Math.ceil(data.frames.length / 2)
@@ -128,7 +141,7 @@ export default class Viewer extends React.Component {
             .catch(e => {
                 if (file !== this.props.file)
                     return;
-                
+
                 console.error(e);
                 this.setState({
                     imageData: [],
@@ -141,16 +154,6 @@ export default class Viewer extends React.Component {
     onWrapModeChange(e) {
         const value = e.target.value;
         this.setState({ wrapMode: value });
-    }
-
-    onReverseFrameOrderChange(e) {
-        const value = e.target.checked;
-        this.setState({ reverseFrameOrder: value });
-    }
-
-    onBounceFrameOrderChange(e) {
-        const value = e.target.checked;
-        this.setState({ bounceFrameOrder: value });
     }
 
     onFrameIncrementChange(e) {
@@ -166,6 +169,11 @@ export default class Viewer extends React.Component {
     onNumberOfFramesToSampleChanged(e) {
         const value = +e.target.value;
         this.setState({ numberOfFramesToSample: value });
+    }
+
+    onWeightModeChange(e) {
+        const value = e.target.value;
+        this.setState({ weightMode: value });
     }
 
     onSampleModeChange(e) {
@@ -193,26 +201,13 @@ export default class Viewer extends React.Component {
         return (
             <div className="gif-viewer" id="viewer">
                 <div className="player-wrapper">
-                    <GifPlayer {...this.state} onRendererLoaded={this.onRendererLoaded.bind(this)} />
+                    <GifPlayer {...this.state} onRendererLoaded={this.onRendererLoaded.bind(this) } />
                 </div>
                 <div className="view-controls">
-                    <WrapModeSelector value={this.state.wrapMode} onChange={this.onWrapModeChange.bind(this) } />
-                    <SampleModeSelector value={this.state.sampleMode} onChange={this.onSampleModeChange.bind(this) } />
 
                     <div className="frame-controls">
                         <div className="full-width">
-                            <LabeledSlider title='Frame Increment'
-                                min="1"
-                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
-                                value={this.state.frameIncrement}
-                                onChange={this.onFrameIncrementChange.bind(this) }/>
-                        </div>
-                        <div className="full-width">
-                            <LabeledSlider title='Initial Frame'
-                                min="0"
-                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
-                                value={this.state.initialFrame}
-                                onChange={this.onInitialFrameChange.bind(this) }/>
+                            <SampleModeSelector value={this.state.sampleMode} onChange={this.onSampleModeChange.bind(this) } />
                         </div>
                         <div className="full-width">
                             <LabeledSlider title='Sample Frames'
@@ -221,17 +216,38 @@ export default class Viewer extends React.Component {
                                 value={this.state.numberOfFramesToSample}
                                 onChange={this.onNumberOfFramesToSampleChanged.bind(this) }/>
                         </div>
-                        <div>
-                            <div className="control-group">
-                                <div className='control-title'>Reverse Frames</div>
-                                <input type="checkbox" value={this.state.reverseFrameOrder} onChange={this.onReverseFrameOrderChange.bind(this) }/>
-                            </div>
+                        <div className="full-width">
+                            <LabeledSlider title='Frame Increment'
+                                min="1"
+                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
+                                value={this.state.frameIncrement}
+                                onChange={this.onFrameIncrementChange.bind(this) }/>
                         </div>
-                        <div>
-                            <div className="control-group">
-                                <div className='control-title'>Mirror Frames</div>
-                                <input type="checkbox" value={this.state.bounceFrameOrder} onChange={this.onBounceFrameOrderChange.bind(this) }/>
-                            </div>
+                    </div>
+
+                    <div className="frame-controls">
+                        <div className="full-width">
+                            <WeightModeSelector value={this.state.weightMode} onChange={this.onWeightModeChange.bind(this) } />
+                        </div>
+                        <div className="full-width">
+                            <LabeledSlider title='Initial Frame'
+                                min="0"
+                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
+                                value={this.state.initialFrame}
+                                onChange={this.onInitialFrameChange.bind(this) }/>
+                        </div>
+                    </div>
+
+                    <div className="frame-controls">
+                        <div className="full-width">
+                            <WrapModeSelector value={this.state.wrapMode} onChange={this.onWrapModeChange.bind(this) } />
+                        </div>
+                        <div className="full-width">
+                            <LabeledSlider title='Initial Frame'
+                                min="0"
+                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
+                                value={this.state.initialFrame}
+                                onChange={this.onInitialFrameChange.bind(this) }/>
                         </div>
                     </div>
 

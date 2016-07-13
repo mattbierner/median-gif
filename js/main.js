@@ -28509,7 +28509,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	/**
-	 * Wrapping mode for frame selections
+	 * Wrapping mode for frame selections.
 	 */
 	var wrapModes = {
 	    'overflow': {
@@ -28550,6 +28550,37 @@
 	}(_react2.default.Component);
 
 	/**
+	 * 
+	 */
+
+
+	var weightModes = {
+	    'equal': {
+	        title: 'Equal',
+	        description: 'equal'
+	    }
+	};
+
+	var WeightModeSelector = function (_React$Component2) {
+	    _inherits(WeightModeSelector, _React$Component2);
+
+	    function WeightModeSelector() {
+	        _classCallCheck(this, WeightModeSelector);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(WeightModeSelector).apply(this, arguments));
+	    }
+
+	    _createClass(WeightModeSelector, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Weight Mode', options: weightModes }));
+	        }
+	    }]);
+
+	    return WeightModeSelector;
+	}(_react2.default.Component);
+
+	/**
 	 * Wrapping mode for frame selections
 	 */
 
@@ -28561,11 +28592,11 @@
 	    },
 	    'reverse': {
 	        title: 'Reverse',
-	        description: 'Select frames before the current frame.'
+	        description: 'Select frames before the current frame'
 	    },
 	    'bi': {
-	        title: 'Bi-Dirrectional',
-	        description: 'Select frames both before and after the current frame.'
+	        title: 'Bi-Directional',
+	        description: 'Select frames both before and after the current frame'
 	    }
 	};
 
@@ -28573,8 +28604,8 @@
 	 * Control for selecting frame selection mode.
 	 */
 
-	var SampleModeSelector = function (_React$Component2) {
-	    _inherits(SampleModeSelector, _React$Component2);
+	var SampleModeSelector = function (_React$Component3) {
+	    _inherits(SampleModeSelector, _React$Component3);
 
 	    function SampleModeSelector() {
 	        _classCallCheck(this, SampleModeSelector);
@@ -28597,22 +28628,20 @@
 	 */
 
 
-	var Viewer = function (_React$Component3) {
-	    _inherits(Viewer, _React$Component3);
+	var Viewer = function (_React$Component4) {
+	    _inherits(Viewer, _React$Component4);
 
 	    function Viewer(props) {
 	        _classCallCheck(this, Viewer);
 
-	        var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(Viewer).call(this, props));
+	        var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Viewer).call(this, props));
 
-	        _this3.state = {
+	        _this4.state = {
 	            imageData: null,
 	            loadingGif: false,
 	            exporting: false,
 
 	            // playback
-	            reverseFrameOrder: false,
-	            bounceFrameOrder: false,
 	            initialFrame: 0,
 	            frameIncrement: 1,
 	            playbackSpeed: 1,
@@ -28620,10 +28649,10 @@
 	            // median
 	            wrapMode: Object.keys(wrapModes)[0],
 	            sampleMode: Object.keys(sampleModes)[0],
-	            numberOfFramesToSample: 1
-
+	            numberOfFramesToSample: 1,
+	            weightMode: Object.keys(weightModes)[0]
 	        };
-	        return _this3;
+	        return _this4;
 	    }
 
 	    _createClass(Viewer, [{
@@ -28641,32 +28670,29 @@
 	    }, {
 	        key: 'loadGif',
 	        value: function loadGif(file) {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            this.setState({ loadingGif: true });
 	            (0, _loadGif3.default)(file).then(function (data) {
-	                if (file !== _this4.props.file) return;
+	                if (file !== _this5.props.file) return;
 
-	                _this4.setState({
+	                _this5.setState({
 	                    imageData: data,
 	                    loadingGif: false,
 	                    error: null,
 
-	                    playbackSpeed: 1,
-	                    reverseFrameOrder: false,
-	                    bounceFrameOrder: false,
 	                    initialFrame: 0,
-
 	                    frameIncrement: 1,
+	                    playbackSpeed: 1,
 
 	                    // median
 	                    numberOfFramesToSample: Math.ceil(data.frames.length / 2)
 	                });
 	            }).catch(function (e) {
-	                if (file !== _this4.props.file) return;
+	                if (file !== _this5.props.file) return;
 
 	                console.error(e);
-	                _this4.setState({
+	                _this5.setState({
 	                    imageData: [],
 	                    loadingGif: false,
 	                    error: 'Could not load gif'
@@ -28678,18 +28704,6 @@
 	        value: function onWrapModeChange(e) {
 	            var value = e.target.value;
 	            this.setState({ wrapMode: value });
-	        }
-	    }, {
-	        key: 'onReverseFrameOrderChange',
-	        value: function onReverseFrameOrderChange(e) {
-	            var value = e.target.checked;
-	            this.setState({ reverseFrameOrder: value });
-	        }
-	    }, {
-	        key: 'onBounceFrameOrderChange',
-	        value: function onBounceFrameOrderChange(e) {
-	            var value = e.target.checked;
-	            this.setState({ bounceFrameOrder: value });
 	        }
 	    }, {
 	        key: 'onFrameIncrementChange',
@@ -28710,6 +28724,12 @@
 	            this.setState({ numberOfFramesToSample: value });
 	        }
 	    }, {
+	        key: 'onWeightModeChange',
+	        value: function onWeightModeChange(e) {
+	            var value = e.target.value;
+	            this.setState({ weightMode: value });
+	        }
+	    }, {
 	        key: 'onSampleModeChange',
 	        value: function onSampleModeChange(e) {
 	            var value = e.target.value;
@@ -28718,13 +28738,13 @@
 	    }, {
 	        key: 'onExport',
 	        value: function onExport() {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            if (!this._renderer) return;
 
 	            this.setState({ exporting: true });
 	            (0, _gif_export2.default)(this.state.imageData, this._renderer, this.state).then(function (blob) {
-	                _this5.setState({ exporting: false });
+	                _this6.setState({ exporting: false });
 	                var url = URL.createObjectURL(blob);
 	                window.open(url);
 	            });
@@ -28748,28 +28768,13 @@
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'view-controls' },
-	                    _react2.default.createElement(WrapModeSelector, { value: this.state.wrapMode, onChange: this.onWrapModeChange.bind(this) }),
-	                    _react2.default.createElement(SampleModeSelector, { value: this.state.sampleMode, onChange: this.onSampleModeChange.bind(this) }),
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'frame-controls' },
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'full-width' },
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Frame Increment',
-	                                min: '1',
-	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
-	                                value: this.state.frameIncrement,
-	                                onChange: this.onFrameIncrementChange.bind(this) })
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'full-width' },
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Initial Frame',
-	                                min: '0',
-	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
-	                                value: this.state.initialFrame,
-	                                onChange: this.onInitialFrameChange.bind(this) })
+	                            _react2.default.createElement(SampleModeSelector, { value: this.state.sampleMode, onChange: this.onSampleModeChange.bind(this) })
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
@@ -28782,31 +28787,48 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
-	                            null,
-	                            _react2.default.createElement(
-	                                'div',
-	                                { className: 'control-group' },
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'control-title' },
-	                                    'Reverse Frames'
-	                                ),
-	                                _react2.default.createElement('input', { type: 'checkbox', value: this.state.reverseFrameOrder, onChange: this.onReverseFrameOrderChange.bind(this) })
-	                            )
+	                            { className: 'full-width' },
+	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Frame Increment',
+	                                min: '1',
+	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
+	                                value: this.state.frameIncrement,
+	                                onChange: this.onFrameIncrementChange.bind(this) })
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'frame-controls' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'full-width' },
+	                            _react2.default.createElement(WeightModeSelector, { value: this.state.weightMode, onChange: this.onWeightModeChange.bind(this) })
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
-	                            null,
-	                            _react2.default.createElement(
-	                                'div',
-	                                { className: 'control-group' },
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'control-title' },
-	                                    'Mirror Frames'
-	                                ),
-	                                _react2.default.createElement('input', { type: 'checkbox', value: this.state.bounceFrameOrder, onChange: this.onBounceFrameOrderChange.bind(this) })
-	                            )
+	                            { className: 'full-width' },
+	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Initial Frame',
+	                                min: '0',
+	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
+	                                value: this.state.initialFrame,
+	                                onChange: this.onInitialFrameChange.bind(this) })
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'frame-controls' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'full-width' },
+	                            _react2.default.createElement(WrapModeSelector, { value: this.state.wrapMode, onChange: this.onWrapModeChange.bind(this) })
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'full-width' },
+	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Initial Frame',
+	                                min: '0',
+	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
+	                                value: this.state.initialFrame,
+	                                onChange: this.onInitialFrameChange.bind(this) })
 	                        )
 	                    ),
 	                    _react2.default.createElement(
@@ -30461,7 +30483,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var tex = this.renderMedian(this._options.currentFrame, this._options.frameIncrement, this._options.sampleMode, this._options.numberOfFramesToSample, this._options.wrapMode);
+	            var tex = this.renderMedian(this._options);
 	            this.renderToScreen(tex.texture || tex);
 	        }
 	    }, {
@@ -30476,7 +30498,7 @@
 	    }, {
 	        key: 'renderToBuffer',
 	        value: function renderToBuffer() {
-	            var tex = this.renderMedian(this._options.currentFrame, this._options.frameIncrement, this._options.sampleMode, this._options.numberOfFramesToSample, this._options.wrapMode);
+	            var tex = this.renderMedian(this._options);
 
 	            var width = tex.width;
 	            var height = tex.height;
@@ -30511,12 +30533,21 @@
 
 	    }, {
 	        key: 'renderMedian',
-	        value: function renderMedian(initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
+	        value: function renderMedian(options) {
+	            var initialFrame = options.initialFrame;
+	            var frameIncrement = options.frameIncrement;
+	            var sampleMode = options.sampleMode;
+	            var numberOfFramesToSample = options.numberOfFramesToSample;
+	            var wrapMode = options.wrapMode;
+
+	            var currentFrame = options.currentFrame + initialFrame;
+
 	            if (sampleMode === 'bi') {
-	                var backwards = this.renderMedianImpl(emptyTexture, 0.5, initialFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode);
-	                return this.renderMedianImpl(backwards.texture || backwards, 0.5, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode);
+	                var backwards = this.renderMedianImpl(emptyTexture, 0.5, currentFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode);
+	                return this.renderMedianImpl(backwards.texture || backwards, 0.5, currentFrame, frameIncrement, numberOfFramesToSample, wrapMode);
 	            }
-	            return this.renderMedianImpl(emptyTexture, 1, initialFrame, sampleMode === 'reverse' ? -frameIncrement : frameIncrement, numberOfFramesToSample, wrapMode);
+
+	            return this.renderMedianImpl(emptyTexture, 1, currentFrame, sampleMode === 'reverse' ? -frameIncrement : frameIncrement, numberOfFramesToSample, wrapMode);
 	        }
 	    }, {
 	        key: 'renderMedianImpl',
@@ -30528,9 +30559,10 @@
 	                var weights = (0, _gen_array2.default)(median_shader_config.arraySize, 0);
 
 	                for (var i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-	                    var index = initialFrame + (startFrame + i) * frameIncrement;
+	                    var sampleNumber = startFrame + i;
+	                    var index = initialFrame + sampleNumber * frameIncrement;
 
-	                    var _getFrame = this.getFrame(index, wrapMode);
+	                    var _getFrame = this.getFrame(sampleNumber, numberOfFramesToSample, index, wrapMode);
 
 	                    var _getFrame2 = _slicedToArray(_getFrame, 2);
 
@@ -30573,36 +30605,40 @@
 
 	    }, {
 	        key: 'getFrame',
-	        value: function getFrame(index, wrapMode) {
+	        value: function getFrame(sampleNumber, numberOfFramesToSample, index, wrapMode) {
+	            var sum = 0;
+	            for (var i = 0; i < numberOfFramesToSample; ++i) {
+	                sum += 10 * Math.exp(-0.2 * i);
+	            }
+	            var mul = 10 * Math.exp(-0.2 * sampleNumber) / sum;
+
+	            var weight = 1;
+	            var sampleIndex = index;
 	            switch (wrapMode) {
 	                case 'clamp':
 	                    {
-	                        var tex = this._frames[Math.max(0, Math.min(index, this._frames.length - 1))];
-	                        var weight = 1.0 / this._options.numberOfFramesToSample;
-	                        return [tex, weight];
+	                        sampleIndex = Math.max(0, Math.min(index, this._frames.length - 1));
+	                        break;
 	                    }
 
 	                case 'stop':
 	                    {
-	                        if (_tex < 0 || _tex > this._frames.length) {
+	                        if (sampleIndex < 0 || sampleIndex > this._frames.length) {
 	                            return [emptyTexture, 0];
 	                        }
-	                        var _tex = this._frames[index];
-	                        var _weight = 1.0 / this._options.numberOfFramesToSample;
-	                        return [_tex, _weight];
+	                        break;
 	                    }
 
 	                case 'overflow':
 	                default:
 	                    {
-	                        index %= this._frames.length;
-	                        if (index < 0) index = this._frames.length - 1 - Math.abs(index);
-
-	                        var _tex2 = this._frames[index];
-	                        var _weight2 = 1.0 / this._options.numberOfFramesToSample;
-	                        return [_tex2, _weight2];
+	                        sampleIndex %= this._frames.length;
+	                        if (sampleIndex < 0) sampleIndex = this._frames.length - 1 - Math.abs(sampleIndex);
+	                        break;
 	                    }
 	            }
+
+	            return [this._frames[sampleIndex], mul * weight];
 	        }
 	    }]);
 

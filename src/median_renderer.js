@@ -100,12 +100,7 @@ export default class MedianRenderer {
      * Main render function.
      */
     render() {
-        const tex = this.renderMedian(
-            this._options.currentFrame,
-            this._options.frameIncrement,
-            this._options.sampleMode,
-            this._options.numberOfFramesToSample,
-            this._options.wrapMode);
+        const tex = this.renderMedian(this._options);
         this.renderToScreen(tex.texture || tex);
     }
 
@@ -118,12 +113,7 @@ export default class MedianRenderer {
     }
 
     renderToBuffer() {
-        const tex = this.renderMedian(
-            this._options.currentFrame,
-            this._options.frameIncrement,
-            this._options.sampleMode,
-            this._options.numberOfFramesToSample,
-            this._options.wrapMode);
+        const tex = this.renderMedian(this._options);
         
         const {width, height} = tex;
         const pixels = this._ensureDataBuffer(width, height);
@@ -150,15 +140,19 @@ export default class MedianRenderer {
     /**
      * Render for median blending. Renders to a texture.
      */
-    renderMedian(initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
+    renderMedian(options) {
+        const {initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode} = options;
+        const currentFrame = options.currentFrame + initialFrame;
+
         if (sampleMode === 'bi') {
-            const backwards = this.renderMedianImpl(emptyTexture, 0.5, initialFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode);
-            return this.renderMedianImpl(backwards.texture || backwards, 0.5, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode);
+            const backwards = this.renderMedianImpl(emptyTexture, 0.5, currentFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode);
+            return this.renderMedianImpl(backwards.texture || backwards, 0.5, currentFrame, frameIncrement, numberOfFramesToSample, wrapMode);
         }
+        
         return this.renderMedianImpl(
             emptyTexture,
             1,
-            initialFrame,
+            currentFrame,
             sampleMode === 'reverse' ? -frameIncrement : frameIncrement,
             numberOfFramesToSample,
             wrapMode);
@@ -172,8 +166,9 @@ export default class MedianRenderer {
             const weights = gen_array(median_shader_config.arraySize, 0);
 
             for (let i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-                const index = initialFrame + (startFrame + i) * frameIncrement;
-                const [tex, weight] = this.getFrame(index, wrapMode);
+                const sampleNumber  = startFrame + i;
+                const index = initialFrame + (sampleNumber * frameIncrement);
+                const [tex, weight] = this.getFrame(sampleNumber, numberOfFramesToSample, index, wrapMode);
                 textures[i] = tex;
                 weights[i] = weight * mul;
             }
@@ -204,36 +199,40 @@ export default class MedianRenderer {
     /**
      * Get the frame and frameWeight of a frame for a given index in the gif.
      */
-    getFrame(index, wrapMode) {
+    getFrame(sampleNumber, numberOfFramesToSample, index, wrapMode) {
+        let sum = 0;
+        for (let i = 0; i < numberOfFramesToSample; ++i) {
+            sum += 10 * Math.exp(-0.2 * i);
+        }
+        let mul = 10 * Math.exp(-0.2 * sampleNumber) / sum; 
+
+        let weight = 1;
+        let sampleIndex = index;
         switch (wrapMode) {
         case 'clamp':
         {
-            const tex = this._frames[Math.max(0, Math.min(index, this._frames.length - 1))];
-            const weight = 1.0 / (this._options.numberOfFramesToSample);
-            return [tex, weight];
+            sampleIndex = Math.max(0, Math.min(index, this._frames.length - 1));
+            break;
         }
 
         case 'stop':
         {
-            if (tex < 0 || tex > this._frames.length) {
+            if (sampleIndex < 0 || sampleIndex > this._frames.length) {
                 return [emptyTexture, 0];
             }
-            const tex = this._frames[index];
-            const weight = 1.0 / (this._options.numberOfFramesToSample);
-            return [tex, weight];
+            break;
         }
 
         case 'overflow':
         default:
         {
-            index %= this._frames.length;
-            if (index < 0)
-                index = this._frames.length - 1 - Math.abs(index);
-            
-            const tex = this._frames[index];
-            const weight = 1.0 / (this._options.numberOfFramesToSample);
-            return [tex, weight];
+            sampleIndex %= this._frames.length;
+            if (sampleIndex < 0)
+                sampleIndex = this._frames.length - 1 - Math.abs(sampleIndex);
+            break;
         }
         }
+
+        return [this._frames[sampleIndex], mul * weight];
     }
 }
