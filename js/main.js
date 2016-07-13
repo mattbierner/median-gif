@@ -85,7 +85,7 @@
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Main).call(this, props));
 
 	        _this.state = {
-	            selectedGif: "https://media2.giphy.com/media/jb5WFJTgSSonu/giphy.gif"
+	            selectedGif: "http://media3.giphy.com/media/3oxRmD9a5pLTOOLigM/giphy.gif"
 	        };
 	        return _this;
 	    }
