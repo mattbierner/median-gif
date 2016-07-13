@@ -174,19 +174,26 @@ export default class Viewer extends React.Component {
     }
 
     onExport() {
+        if (!this._renderer)
+            return;
+
         this.setState({ exporting: true });
-        exportGif(this.state.imageData, this.state).then(blob => {
+        exportGif(this.state.imageData, this._renderer, this.state).then(blob => {
             this.setState({ exporting: false });
             const url = URL.createObjectURL(blob);
             window.open(url);
         });
     }
 
+    onRendererLoaded(renderer) {
+        this._renderer = renderer;
+    }
+
     render() {
         return (
             <div className="gif-viewer" id="viewer">
                 <div className="player-wrapper">
-                    <GifPlayer {...this.state} />
+                    <GifPlayer {...this.state} onRendererLoaded={this.onRendererLoaded.bind(this)} />
                 </div>
                 <div className="view-controls">
                     <WrapModeSelector value={this.state.wrapMode} onChange={this.onWrapModeChange.bind(this) } />

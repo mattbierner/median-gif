@@ -1,14 +1,15 @@
 const GifEncoder = require('gif-encoder');
-//import * as scanline_renderer from './scanline_renderer';
+import MedianRenderer from './median_renderer';
 
 /**
- * 
+ * Exprt
  */
-export default (imageData, props) => {
+export default (imageData, sourceRenderer, props) => {
     const gif = new GifEncoder(imageData.width, imageData.height);
 
     const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const renderer = new MedianRenderer(canvas);
+    renderer.clone(sourceRenderer);
 
     const p = new Promise((resolve) => {
         const parts = [];
@@ -24,9 +25,9 @@ export default (imageData, props) => {
 
     setTimeout(() => {
         for (let i = 0; i < imageData.frames.length; ++i) {
-            scanline_renderer.drawForOptions(canvas, ctx, imageData, Object.assign({ currentFrame: i }, props));
+            renderer.setOptions(Object.assign({ currentFrame: i }, props));
             gif.setDelay(imageData.frames[i].info.delay * 10);
-            gif.addFrame(ctx.getImageData(0, 0, imageData.width, imageData.height).data);
+            gif.addFrame(renderer.renderToBuffer());
         }
         gif.finish();
     }, 0);

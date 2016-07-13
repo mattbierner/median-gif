@@ -28720,12 +28720,19 @@
 	        value: function onExport() {
 	            var _this5 = this;
 
+	            if (!this._renderer) return;
+
 	            this.setState({ exporting: true });
-	            (0, _gif_export2.default)(this.state.imageData, this.state).then(function (blob) {
+	            (0, _gif_export2.default)(this.state.imageData, this._renderer, this.state).then(function (blob) {
 	                _this5.setState({ exporting: false });
 	                var url = URL.createObjectURL(blob);
 	                window.open(url);
 	            });
+	        }
+	    }, {
+	        key: 'onRendererLoaded',
+	        value: function onRendererLoaded(renderer) {
+	            this._renderer = renderer;
 	        }
 	    }, {
 	        key: 'render',
@@ -28736,7 +28743,7 @@
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'player-wrapper' },
-	                    _react2.default.createElement(_gif_player2.default, this.state)
+	                    _react2.default.createElement(_gif_player2.default, _extends({}, this.state, { onRendererLoaded: this.onRendererLoaded.bind(this) }))
 	                ),
 	                _react2.default.createElement(
 	                    'div',
@@ -30261,6 +30268,9 @@
 	            if (this.props.imageData) {
 	                this._renderer.setGif(this.props.imageData, this.props);
 	            }
+	            this._renderer.render();
+
+	            if (this.props.onRendererLoaded) this.props.onRendererLoaded(this._renderer);
 	        }
 	    }, {
 	        key: 'componentWillReceiveProps',
@@ -30269,6 +30279,7 @@
 	                this._renderer.setGif(newProps.imageData);
 	            }
 	            this._renderer.setOptions(newProps);
+	            this._renderer.render();
 	        }
 	    }, {
 	        key: 'render',
@@ -30336,6 +30347,7 @@
 	        this.initRenderer(canvas);
 	        this.resize(100, 100);
 
+	        this.initMaterials();
 	        this.initGeometry();
 	    }
 
@@ -30343,20 +30355,24 @@
 	        key: 'initRenderer',
 	        value: function initRenderer(canvas) {
 	            this._renderer = new _three2.default.WebGLRenderer({
-	                canvas: canvas
+	                canvas: canvas,
+	                preserveDrawingBuffer: true
 	            });
 	            this._renderer.setClearColor(0xffffff, 0);
 	            this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+	        }
+	    }, {
+	        key: 'initMaterials',
+	        value: function initMaterials() {
+	            this._material = new _three2.default.ShaderMaterial(median_shader_config.default).clone();
+	            this._materialScreen = new _three2.default.ShaderMaterial(_screen2.default).clone();
 	        }
 	    }, {
 	        key: 'initGeometry',
 	        value: function initGeometry() {
 	            var plane = new _three2.default.PlaneGeometry(2, 2);
 
-	            this._material = new _three2.default.ShaderMaterial(median_shader_config.default);
 	            this._sceneRTT.add(new _three2.default.Mesh(plane, this._material));
-
-	            this._materialScreen = new _three2.default.ShaderMaterial(_screen2.default);
 	            this._scene.add(new _three2.default.Mesh(plane, this._materialScreen));
 	        }
 	    }, {
@@ -30400,24 +30416,39 @@
 	        key: 'setOptions',
 	        value: function setOptions(options) {
 	            this._options = options;
-	            this.render();
+	        }
+	    }, {
+	        key: 'clone',
+	        value: function clone(renderer) {
+	            this._frames = renderer._frames;
+	            this._options = renderer._options;
+	            this.resize(renderer._width, renderer._height);
 	        }
 	    }, {
 	        key: 'resize',
 	        value: function resize(width, height) {
+	            this._width = width;
+	            this._height = height;
 	            this._camera = new _three2.default.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -10000, 10000);
 	            this._camera.position.z = 100;
 
 	            this._rtTexture1 = new _three2.default.WebGLRenderTarget(width, height, {
 	                minFilter: _three2.default.LinearFilter,
 	                magFilter: _three2.default.NearestFilter,
-	                format: _three2.default.RGBFormat
+	                format: _three2.default.RGBFormat,
+	                depthBuffer: false,
+	                stencilBuffer: false
 	            });
+
+	            this._rtTexture1.texture.wrapS = _three2.default.RepeatWrapping;
+	            this._rtTexture1.texture.wrapT = _three2.default.RepeatWrapping;
 
 	            this._rtTexture2 = new _three2.default.WebGLRenderTarget(width, height, {
 	                minFilter: _three2.default.LinearFilter,
 	                magFilter: _three2.default.NearestFilter,
-	                format: _three2.default.RGBFormat
+	                format: _three2.default.RGBFormat,
+	                depthBuffer: false,
+	                stencilBuffer: false
 	            });
 
 	            this._renderer.setSize(width, height);
@@ -30430,7 +30461,35 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return this.renderToScreen(this.renderMedian(this._options.currentFrame, this._options.frameIncrement, this._options.sampleMode, this._options.numberOfFramesToSample, this._options.wrapMode));
+	            var tex = this.renderMedian(this._options.currentFrame, this._options.frameIncrement, this._options.sampleMode, this._options.numberOfFramesToSample, this._options.wrapMode);
+	            this.renderToScreen(tex.texture || tex);
+	        }
+	    }, {
+	        key: '_ensureDataBuffer',
+	        value: function _ensureDataBuffer(width, height) {
+	            var size = 4 * width * height;
+	            if (!this._dataBuffer || this._dataBuffer.length !== size) {
+	                this._dataBuffer = new Uint8Array(size);
+	            }
+	            return this._dataBuffer;
+	        }
+	    }, {
+	        key: 'renderToBuffer',
+	        value: function renderToBuffer() {
+	            var tex = this.renderMedian(this._options.currentFrame, this._options.frameIncrement, this._options.sampleMode, this._options.numberOfFramesToSample, this._options.wrapMode);
+
+	            var width = tex.width;
+	            var height = tex.height;
+
+	            var pixels = this._ensureDataBuffer(width, height);
+
+	            this._materialScreen.uniforms.flip.value = 1;
+	            this._materialScreen.uniforms.flip.needsUpdate = true;
+
+	            this.renderToScreen(tex.texture || tex);
+	            var gl = this._renderer.getContext();
+	            gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+	            return pixels;
 	        }
 
 	        /**
@@ -30455,7 +30514,7 @@
 	        value: function renderMedian(initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
 	            if (sampleMode === 'bi') {
 	                var backwards = this.renderMedianImpl(emptyTexture, 0.5, initialFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode);
-	                return this.renderMedianImpl(backwards, 0.5, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode);
+	                return this.renderMedianImpl(backwards.texture || backwards, 0.5, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode);
 	            }
 	            return this.renderMedianImpl(emptyTexture, 1, initialFrame, sampleMode === 'reverse' ? -frameIncrement : frameIncrement, numberOfFramesToSample, wrapMode);
 	        }
@@ -30485,7 +30544,7 @@
 	                source = this.renderGifFrames(textures, weights, source, dest);
 	                dest = dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1;
 	            }
-	            return source.texture || source;
+	            return source;
 	        }
 
 	        /**
@@ -33912,33 +33971,42 @@
 
 	exports.default = {
 	    uniforms: {
+	        flip: { type: 'i', value: 0 },
 	        tDiffuse: { type: 't' }
 	    },
-	    vertexShader: '\n        varying vec2 vUv;\n        uniform float time;\n        \n        void main() {\n            vUv = uv;\n            gl_Position = vec4(position, 1.0);\n        }\n    ',
-	    fragmentShader: '\n        varying vec2 vUv;\n        uniform sampler2D tDiffuse;\n        void main() {\n            vec4 color = texture2D(tDiffuse, vUv);\n            gl_FragColor = color;\n        }\n    '
+	    vertexShader: '\n        uniform int flip;\n\n        varying vec2 vUv;\n        \n        void main() {\n            if (flip > 0)\n                vUv = vec2(uv.s, 1.0 - uv.t);\n            else\n                vUv = uv;\n            gl_Position = vec4(position, 1.0);\n        }\n    ',
+	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        \n        varying vec2 vUv;\n\n        void main() {\n            gl_FragColor =  texture2D(tDiffuse, vUv);\n        }\n    '
 	};
 
 /***/ },
 /* 220 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+
+	var _median_renderer = __webpack_require__(215);
+
+	var _median_renderer2 = _interopRequireDefault(_median_renderer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	var GifEncoder = __webpack_require__(221);
-	//import * as scanline_renderer from './scanline_renderer';
+
 
 	/**
-	 * 
+	 * Exprt
 	 */
 
-	exports.default = function (imageData, props) {
+	exports.default = function (imageData, sourceRenderer, props) {
 	    var gif = new GifEncoder(imageData.width, imageData.height);
 
 	    var canvas = document.createElement("canvas");
-	    var ctx = canvas.getContext("2d");
+	    var renderer = new _median_renderer2.default(canvas);
+	    renderer.clone(sourceRenderer);
 
 	    var p = new Promise(function (resolve) {
 	        var parts = [];
@@ -33956,9 +34024,9 @@
 
 	    setTimeout(function () {
 	        for (var i = 0; i < imageData.frames.length; ++i) {
-	            scanline_renderer.drawForOptions(canvas, ctx, imageData, Object.assign({ currentFrame: i }, props));
+	            renderer.setOptions(Object.assign({ currentFrame: i }, props));
 	            gif.setDelay(imageData.frames[i].info.delay * 10);
-	            gif.addFrame(ctx.getImageData(0, 0, imageData.width, imageData.height).data);
+	            gif.addFrame(renderer.renderToBuffer());
 	        }
 	        gif.finish();
 	    }, 0);

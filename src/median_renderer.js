@@ -19,24 +19,28 @@ export default class MedianRenderer {
         this.initRenderer(canvas);
         this.resize(100, 100);
 
+        this.initMaterials();
         this.initGeometry()
     }
 
     initRenderer(canvas) {
         this._renderer = new THREE.WebGLRenderer({
-            canvas: canvas
+            canvas: canvas,
+            preserveDrawingBuffer: true
         });
         this._renderer.setClearColor(0xffffff, 0);
         this._renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
     }
 
+    initMaterials() {
+        this._material = new THREE.ShaderMaterial(median_shader).clone();
+        this._materialScreen = new THREE.ShaderMaterial(screen_shader).clone();
+    }
+
     initGeometry() {
         const plane = new THREE.PlaneGeometry(2, 2);
 
-        this._material = new THREE.ShaderMaterial(median_shader);
         this._sceneRTT.add(new THREE.Mesh(plane, this._material));
-
-        this._materialScreen = new THREE.ShaderMaterial(screen_shader);
         this._scene.add(new THREE.Mesh(plane, this._materialScreen));
     }
 
@@ -56,23 +60,37 @@ export default class MedianRenderer {
 
     setOptions(options) {
         this._options = options;
-        this.render();
+    }
+
+    clone(renderer) {
+        this._frames = renderer._frames;
+        this._options = renderer._options;
+        this.resize(renderer._width, renderer._height);
     }
 
     resize(width, height) {
+        this._width = width;
+        this._height = height;
         this._camera = new THREE.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, -10000, 10000);
         this._camera.position.z = 100;
 
         this._rtTexture1 = new THREE.WebGLRenderTarget(width, height, {
             minFilter: THREE.LinearFilter,
             magFilter: THREE.NearestFilter,
-            format: THREE.RGBFormat
+            format: THREE.RGBFormat,
+            depthBuffer: false,
+            stencilBuffer: false
         });
+
+        this._rtTexture1.texture.wrapS = THREE.RepeatWrapping;
+        this._rtTexture1.texture.wrapT = THREE.RepeatWrapping;
 
         this._rtTexture2 = new THREE.WebGLRenderTarget(width, height, {
             minFilter: THREE.LinearFilter,
             magFilter: THREE.NearestFilter,
-            format: THREE.RGBFormat
+            format: THREE.RGBFormat,
+            depthBuffer: false,
+            stencilBuffer: false
         });
 
         this._renderer.setSize(width, height);
@@ -82,12 +100,41 @@ export default class MedianRenderer {
      * Main render function.
      */
     render() {
-        return this.renderToScreen(this.renderMedian(
+        const tex = this.renderMedian(
             this._options.currentFrame,
             this._options.frameIncrement,
             this._options.sampleMode,
             this._options.numberOfFramesToSample,
-            this._options.wrapMode));
+            this._options.wrapMode);
+        this.renderToScreen(tex.texture || tex);
+    }
+
+    _ensureDataBuffer(width, height) {
+        const size = 4 * width * height;
+        if (!this._dataBuffer || this._dataBuffer.length !== size) {
+            this._dataBuffer = new Uint8Array(size);
+        }
+        return this._dataBuffer;
+    }
+
+    renderToBuffer() {
+        const tex = this.renderMedian(
+            this._options.currentFrame,
+            this._options.frameIncrement,
+            this._options.sampleMode,
+            this._options.numberOfFramesToSample,
+            this._options.wrapMode);
+        
+        const {width, height} = tex;
+        const pixels = this._ensureDataBuffer(width, height);
+
+        this._materialScreen.uniforms.flip.value = 1;
+        this._materialScreen.uniforms.flip.needsUpdate = true;
+
+        this.renderToScreen(tex.texture || tex);
+        const gl = this._renderer.getContext();
+        gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+        return pixels;
     }
 
     /**
@@ -105,8 +152,8 @@ export default class MedianRenderer {
      */
     renderMedian(initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode) {
         if (sampleMode === 'bi') {
-            const backwards = this.renderMedianImpl(emptyTexture, 0.5, initialFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode)
-            return  this.renderMedianImpl(backwards, 0.5, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode);
+            const backwards = this.renderMedianImpl(emptyTexture, 0.5, initialFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode);
+            return this.renderMedianImpl(backwards.texture || backwards, 0.5, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode);
         }
         return this.renderMedianImpl(
             emptyTexture,
@@ -134,7 +181,7 @@ export default class MedianRenderer {
             source = this.renderGifFrames(textures, weights, source, dest);
             dest = (dest === this._rtTexture1 ? this._rtTexture2 : this._rtTexture1); 
         }
-        return source.texture || source;
+        return source;
     }
 
     /**

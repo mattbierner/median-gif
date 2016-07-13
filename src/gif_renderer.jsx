@@ -14,6 +14,10 @@ export default class GifRenderer extends React.Component {
         if (this.props.imageData) {
             this._renderer.setGif(this.props.imageData, this.props);
         }
+        this._renderer.render();
+
+        if (this.props.onRendererLoaded)
+            this.props.onRendererLoaded(this._renderer);
     }
 
     componentWillReceiveProps(newProps) {
@@ -21,6 +25,7 @@ export default class GifRenderer extends React.Component {
             this._renderer.setGif(newProps.imageData);
         }
         this._renderer.setOptions(newProps);
+        this._renderer.render();
     }
 
     render() {
