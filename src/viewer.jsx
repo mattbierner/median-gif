@@ -8,23 +8,9 @@ import LoadingSpinner from './loading_spinner';
 import GifPlayer from './gif_player';
 import exportGif from './gif_export';
 
-/**
- * Wrapping mode for frame selections.
- */
-const wrapModes = {
-    'overflow': {
-        title: 'Overflow',
-        description: 'overflow'
-    },
-    'clamp': {
-        title: 'Clamp',
-        description: 'clamp'
-    },
-    'stop': {
-        title: 'Stop',
-        description: 'stop'
-    }
-};
+import sampleModes from './options/sample_modes';
+import weightModes from './options/weight_modes';
+import wrapModes from './options/wrap_modes';
 
 /**
  * Control for selecting wrapping mode.
@@ -37,16 +23,6 @@ class WrapModeSelector extends React.Component {
     }
 }
 
-/**
- * 
- */
-const weightModes = {
-    'equal': {
-        title: 'Equal',
-        description: 'equal'
-    },
-};
-
 class WeightModeSelector extends React.Component {
     render() {
         return (
@@ -55,23 +31,6 @@ class WeightModeSelector extends React.Component {
     }
 }
 
-/**
- * Wrapping mode for frame selections
- */
-const sampleModes = {
-    'forward': {
-        title: 'Forwards',
-        description: 'Select frames after the current frame'
-    },
-    'reverse': {
-        title: 'Reverse',
-        description: 'Select frames before the current frame'
-    },
-    'bi': {
-        title: 'Bi-Directional',
-        description: 'Select frames both before and after the current frame'
-    }
-};
 
 /**
  * Control for selecting frame selection mode.
@@ -260,4 +219,4 @@ export default class Viewer extends React.Component {
                 </div>
             </div>);
     }
-};
+}

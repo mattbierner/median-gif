@@ -28500,6 +28500,18 @@
 
 	var _gif_export2 = _interopRequireDefault(_gif_export);
 
+	var _sample_modes = __webpack_require__(226);
+
+	var _sample_modes2 = _interopRequireDefault(_sample_modes);
+
+	var _weight_modes = __webpack_require__(227);
+
+	var _weight_modes2 = _interopRequireDefault(_weight_modes);
+
+	var _wrap_modes = __webpack_require__(225);
+
+	var _wrap_modes2 = _interopRequireDefault(_wrap_modes);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28507,24 +28519,6 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * Wrapping mode for frame selections.
-	 */
-	var wrapModes = {
-	    'overflow': {
-	        title: 'Overflow',
-	        description: 'overflow'
-	    },
-	    'clamp': {
-	        title: 'Clamp',
-	        description: 'clamp'
-	    },
-	    'stop': {
-	        title: 'Stop',
-	        description: 'stop'
-	    }
-	};
 
 	/**
 	 * Control for selecting wrapping mode.
@@ -28542,24 +28536,12 @@
 	    _createClass(WrapModeSelector, [{
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Wrap Mode', options: wrapModes }));
+	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Wrap Mode', options: _wrap_modes2.default }));
 	        }
 	    }]);
 
 	    return WrapModeSelector;
 	}(_react2.default.Component);
-
-	/**
-	 * 
-	 */
-
-
-	var weightModes = {
-	    'equal': {
-	        title: 'Equal',
-	        description: 'equal'
-	    }
-	};
 
 	var WeightModeSelector = function (_React$Component2) {
 	    _inherits(WeightModeSelector, _React$Component2);
@@ -28573,7 +28555,7 @@
 	    _createClass(WeightModeSelector, [{
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Weight Mode', options: weightModes }));
+	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Weight Mode', options: _weight_modes2.default }));
 	        }
 	    }]);
 
@@ -28581,28 +28563,9 @@
 	}(_react2.default.Component);
 
 	/**
-	 * Wrapping mode for frame selections
-	 */
-
-
-	var sampleModes = {
-	    'forward': {
-	        title: 'Forwards',
-	        description: 'Select frames after the current frame'
-	    },
-	    'reverse': {
-	        title: 'Reverse',
-	        description: 'Select frames before the current frame'
-	    },
-	    'bi': {
-	        title: 'Bi-Directional',
-	        description: 'Select frames both before and after the current frame'
-	    }
-	};
-
-	/**
 	 * Control for selecting frame selection mode.
 	 */
+
 
 	var SampleModeSelector = function (_React$Component3) {
 	    _inherits(SampleModeSelector, _React$Component3);
@@ -28616,7 +28579,7 @@
 	    _createClass(SampleModeSelector, [{
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Sample Mode', options: sampleModes }));
+	            return _react2.default.createElement(_labeled_selector2.default, _extends({}, this.props, { title: 'Sample Mode', options: _sample_modes2.default }));
 	        }
 	    }]);
 
@@ -28647,10 +28610,10 @@
 	            playbackSpeed: 1,
 
 	            // median
-	            wrapMode: Object.keys(wrapModes)[0],
-	            sampleMode: Object.keys(sampleModes)[0],
+	            wrapMode: Object.keys(_wrap_modes2.default)[0],
+	            sampleMode: Object.keys(_sample_modes2.default)[0],
 	            numberOfFramesToSample: 1,
-	            weightMode: Object.keys(weightModes)[0]
+	            weightMode: Object.keys(_weight_modes2.default)[0]
 	        };
 	        return _this4;
 	    }
@@ -28854,7 +28817,6 @@
 	}(_react2.default.Component);
 
 	exports.default = Viewer;
-	;
 
 /***/ },
 /* 209 */
@@ -35669,6 +35631,79 @@
 	}
 
 	module.exports = LZWEncoder;
+
+/***/ },
+/* 225 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 * Wrapping mode for frame selections.
+	 */
+	exports.default = {
+	    'overflow': {
+	        title: 'Overflow',
+	        description: 'overflow'
+	    },
+	    'clamp': {
+	        title: 'Clamp',
+	        description: 'clamp'
+	    },
+	    'stop': {
+	        title: 'Stop',
+	        description: 'stop'
+	    }
+	};
+
+/***/ },
+/* 226 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 * Wrapping mode for frame selections
+	 */
+	exports.default = {
+	    'forward': {
+	        title: 'Forwards',
+	        description: 'Select frames after the current frame'
+	    },
+	    'reverse': {
+	        title: 'Reverse',
+	        description: 'Select frames before the current frame'
+	    },
+	    'bi': {
+	        title: 'Bi-Directional',
+	        description: 'Select frames both before and after the current frame'
+	    }
+	};
+
+/***/ },
+/* 227 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 * 
+	 */
+	exports.default = {
+	    'equal': {
+	        title: 'Equal',
+	        description: 'equal'
+	    }
+	};
 
 /***/ }
 /******/ ]);
