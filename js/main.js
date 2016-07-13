@@ -21090,7 +21090,7 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _loading_spinner = __webpack_require__(171);
+	var _loading_spinner = __webpack_require__(230);
 
 	var _loading_spinner2 = _interopRequireDefault(_loading_spinner);
 
@@ -21372,59 +21372,7 @@
 	;
 
 /***/ },
-/* 171 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactDom = __webpack_require__(33);
-
-	var _reactDom2 = _interopRequireDefault(_reactDom);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var LoadingSpinner = function (_React$Component) {
-	    _inherits(LoadingSpinner, _React$Component);
-
-	    function LoadingSpinner() {
-	        _classCallCheck(this, LoadingSpinner);
-
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(LoadingSpinner).apply(this, arguments));
-	    }
-
-	    _createClass(LoadingSpinner, [{
-	        key: 'render',
-	        value: function render() {
-	            return _react2.default.createElement(
-	                'span',
-	                { className: "material-icons loading-spinner " + (this.props.active ? '' : 'hidden') },
-	                'autorenew'
-	            );
-	        }
-	    }]);
-
-	    return LoadingSpinner;
-	}(_react2.default.Component);
-
-	exports.default = LoadingSpinner;
-
-/***/ },
+/* 171 */,
 /* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -28480,15 +28428,15 @@
 
 	var _loadGif3 = _interopRequireDefault(_loadGif2);
 
-	var _labeled_selector = __webpack_require__(211);
+	var _labeled_selector = __webpack_require__(228);
 
 	var _labeled_selector2 = _interopRequireDefault(_labeled_selector);
 
-	var _labeled_slider = __webpack_require__(212);
+	var _labeled_slider = __webpack_require__(229);
 
 	var _labeled_slider2 = _interopRequireDefault(_labeled_slider);
 
-	var _loading_spinner = __webpack_require__(171);
+	var _loading_spinner = __webpack_require__(230);
 
 	var _loading_spinner2 = _interopRequireDefault(_loading_spinner);
 
@@ -29795,171 +29743,8 @@
 	} catch (e) {} // CommonJS.
 
 /***/ },
-/* 211 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactDom = __webpack_require__(33);
-
-	var _reactDom2 = _interopRequireDefault(_reactDom);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * Generic selector controls
-	 */
-
-	var Selector = function (_React$Component) {
-	    _inherits(Selector, _React$Component);
-
-	    function Selector() {
-	        _classCallCheck(this, Selector);
-
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Selector).apply(this, arguments));
-	    }
-
-	    _createClass(Selector, [{
-	        key: 'render',
-	        value: function render() {
-	            var _this2 = this;
-
-	            var modeOptions = Object.keys(this.props.options).map(function (x) {
-	                return _react2.default.createElement(
-	                    'option',
-	                    { value: x, key: x },
-	                    _this2.props.options[x].title
-	                );
-	            });
-	            return _react2.default.createElement(
-	                'div',
-	                { className: 'control-group' },
-	                _react2.default.createElement(
-	                    'span',
-	                    { className: 'control-title' },
-	                    this.props.title,
-	                    ' '
-	                ),
-	                _react2.default.createElement(
-	                    'select',
-	                    { value: this.props.value, onChange: this.props.onChange },
-	                    modeOptions
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'control-description' },
-	                    this.props.options[this.props.value].description
-	                )
-	            );
-	        }
-	    }]);
-
-	    return Selector;
-	}(_react2.default.Component);
-
-	exports.default = Selector;
-
-/***/ },
-/* 212 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactDom = __webpack_require__(33);
-
-	var _reactDom2 = _interopRequireDefault(_reactDom);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * 
-	 */
-
-	var LabeledRange = function (_React$Component) {
-	    _inherits(LabeledRange, _React$Component);
-
-	    function LabeledRange() {
-	        _classCallCheck(this, LabeledRange);
-
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(LabeledRange).apply(this, arguments));
-	    }
-
-	    _createClass(LabeledRange, [{
-	        key: 'render',
-	        value: function render() {
-	            var title = this.props.title ? _react2.default.createElement(
-	                'div',
-	                { className: 'control-title' },
-	                this.props.title
-	            ) : '';
-	            return _react2.default.createElement(
-	                'div',
-	                { className: 'control-group labeled-slider ' + (this.props.className || '') },
-	                title,
-	                _react2.default.createElement('input', { className: 'slider',
-	                    type: 'range',
-	                    min: this.props.min,
-	                    max: this.props.max,
-	                    value: this.props.value,
-	                    onChange: this.props.onChange }),
-	                _react2.default.createElement(
-	                    'span',
-	                    { className: 'min label' },
-	                    this.props.min
-	                ),
-	                _react2.default.createElement(
-	                    'span',
-	                    { className: 'max label' },
-	                    this.props.max
-	                ),
-	                _react2.default.createElement(
-	                    'span',
-	                    { className: 'value label' },
-	                    this.props.value + (this.props.units || '')
-	                )
-	            );
-	        }
-	    }]);
-
-	    return LabeledRange;
-	}(_react2.default.Component);
-
-	exports.default = LabeledRange;
-	;
-
-/***/ },
+/* 211 */,
+/* 212 */,
 /* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -29981,11 +29766,11 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _labeled_slider = __webpack_require__(212);
+	var _labeled_slider = __webpack_require__(229);
 
 	var _labeled_slider2 = _interopRequireDefault(_labeled_slider);
 
-	var _loading_spinner = __webpack_require__(171);
+	var _loading_spinner = __webpack_require__(230);
 
 	var _loading_spinner2 = _interopRequireDefault(_loading_spinner);
 
@@ -30012,7 +29797,7 @@
 	};
 
 	/**
-	 * Select playback speed.
+	 * Playback speed selector.
 	 */
 
 	var SpeedSelector = function (_React$Component) {
@@ -35798,6 +35583,223 @@
 	        description: 'stop'
 	    }
 	};
+
+/***/ },
+/* 228 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(33);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * Generic selector controls
+	 */
+
+	var Selector = function (_React$Component) {
+	    _inherits(Selector, _React$Component);
+
+	    function Selector() {
+	        _classCallCheck(this, Selector);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Selector).apply(this, arguments));
+	    }
+
+	    _createClass(Selector, [{
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+
+	            var modeOptions = Object.keys(this.props.options).map(function (x) {
+	                return _react2.default.createElement(
+	                    'option',
+	                    { value: x, key: x },
+	                    _this2.props.options[x].title
+	                );
+	            });
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'control-group' },
+	                _react2.default.createElement(
+	                    'span',
+	                    { className: 'control-title' },
+	                    this.props.title,
+	                    ' '
+	                ),
+	                _react2.default.createElement(
+	                    'select',
+	                    { value: this.props.value, onChange: this.props.onChange },
+	                    modeOptions
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'control-description' },
+	                    this.props.options[this.props.value].description
+	                )
+	            );
+	        }
+	    }]);
+
+	    return Selector;
+	}(_react2.default.Component);
+
+	exports.default = Selector;
+
+/***/ },
+/* 229 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(33);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * Number slider with a title and description of values.
+	 */
+
+	var LabeledRange = function (_React$Component) {
+	    _inherits(LabeledRange, _React$Component);
+
+	    function LabeledRange() {
+	        _classCallCheck(this, LabeledRange);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(LabeledRange).apply(this, arguments));
+	    }
+
+	    _createClass(LabeledRange, [{
+	        key: 'render',
+	        value: function render() {
+	            var title = this.props.title ? _react2.default.createElement(
+	                'div',
+	                { className: 'control-title' },
+	                this.props.title
+	            ) : '';
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'control-group labeled-slider ' + (this.props.className || '') },
+	                title,
+	                _react2.default.createElement('input', { className: 'slider',
+	                    type: 'range',
+	                    min: this.props.min,
+	                    max: this.props.max,
+	                    value: this.props.value,
+	                    onChange: this.props.onChange }),
+	                _react2.default.createElement(
+	                    'span',
+	                    { className: 'min label' },
+	                    this.props.min
+	                ),
+	                _react2.default.createElement(
+	                    'span',
+	                    { className: 'max label' },
+	                    this.props.max
+	                ),
+	                _react2.default.createElement(
+	                    'span',
+	                    { className: 'value label' },
+	                    this.props.value + (this.props.units || '')
+	                )
+	            );
+	        }
+	    }]);
+
+	    return LabeledRange;
+	}(_react2.default.Component);
+
+	exports.default = LabeledRange;
+
+/***/ },
+/* 230 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(33);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var LoadingSpinner = function (_React$Component) {
+	    _inherits(LoadingSpinner, _React$Component);
+
+	    function LoadingSpinner() {
+	        _classCallCheck(this, LoadingSpinner);
+
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(LoadingSpinner).apply(this, arguments));
+	    }
+
+	    _createClass(LoadingSpinner, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'span',
+	                { className: "material-icons loading-spinner " + (this.props.active ? '' : 'hidden') },
+	                'autorenew'
+	            );
+	        }
+	    }]);
+
+	    return LoadingSpinner;
+	}(_react2.default.Component);
+
+	exports.default = LoadingSpinner;
 
 /***/ }
 /******/ ]);

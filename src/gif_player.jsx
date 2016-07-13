@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import LabeledSlider from './labeled_slider';
-import LoadingSpinner from './loading_spinner';
+import LabeledSlider from './components/labeled_slider';
+import LoadingSpinner from './components/loading_spinner';
 import GifRenderer from './gif_renderer';
 
 const playbackSpeeds = {
@@ -16,7 +16,7 @@ const playbackSpeeds = {
 };
 
 /**
- * Select playback speed.
+ * Playback speed selector.
  */
 class SpeedSelector extends React.Component {
     render() {
@@ -28,7 +28,8 @@ class SpeedSelector extends React.Component {
                 <select value={this.props.value} onChange={this.props.onChange}>
                     {options}
                 </select>
-            </div>);
+            </div>
+        );
     }
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import LoadingSpinner from './loading_spinner';
+import LoadingSpinner from './components/loading_spinner';
 
 const giphy = require('giphy-api')({
     https: true,

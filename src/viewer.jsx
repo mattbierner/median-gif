@@ -2,9 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import loadGif from './loadGif';
-import LabeledSelector from './labeled_selector';
-import LabeledSlider from './labeled_slider';
-import LoadingSpinner from './loading_spinner';
+import LabeledSelector from './components/labeled_selector';
+import LabeledSlider from './components/labeled_slider';
+import LoadingSpinner from './components/loading_spinner';
 import GifPlayer from './gif_player';
 import exportGif from './gif_export';
 
