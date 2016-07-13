@@ -30328,9 +30328,10 @@
 	            if (this.props.imageData) {
 	                this._renderer.setGif(this.props.imageData, this.props);
 	            }
-	            this._renderer.render();
 
 	            if (this.props.onRendererLoaded) this.props.onRendererLoaded(this._renderer);
+
+	            this._renderer.render();
 	        }
 	    }, {
 	        key: 'componentWillReceiveProps',
@@ -30344,9 +30345,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement('canvas', { className: 'gif-canvas',
-	                width: this.props.imageData ? this.props.imageData.width : 100,
-	                height: this.props.imageData ? this.props.imageData.height : 100 });
+	            return _react2.default.createElement('canvas', { className: 'gif-canvas' });
 	        }
 	    }]);
 

@@ -8,9 +8,8 @@
 }
 
 .gif-canvas {
-    max-width: 100%;
-    min-width: 300px;
-    height: auto;
+    max-width: 100% !important;
+    height: auto !important;
 }
 
 .gif-properties {

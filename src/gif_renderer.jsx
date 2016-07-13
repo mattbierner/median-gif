@@ -14,10 +14,11 @@ export default class GifRenderer extends React.Component {
         if (this.props.imageData) {
             this._renderer.setGif(this.props.imageData, this.props);
         }
-        this._renderer.render();
 
         if (this.props.onRendererLoaded)
             this.props.onRendererLoaded(this._renderer);
+
+        this._renderer.render();
     }
 
     componentWillReceiveProps(newProps) {
@@ -30,9 +31,7 @@ export default class GifRenderer extends React.Component {
 
     render() {
         return (
-            <canvas className="gif-canvas"
-                width={this.props.imageData ? this.props.imageData.width : 100}
-                height={this.props.imageData ? this.props.imageData.height : 100}  />
+            <canvas className="gif-canvas" />
         );
     }
 };
