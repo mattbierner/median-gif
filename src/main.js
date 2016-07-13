@@ -25,7 +25,8 @@ class Main extends React.Component {
             <div className="main container">
                 <Viewer file={this.state.selectedGif} />
                 <Search onGifSelected={this.onGifSelected.bind(this) } />
-            </div>);
+            </div>
+        );
     }
 };
 

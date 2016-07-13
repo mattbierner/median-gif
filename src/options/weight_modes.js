@@ -8,7 +8,7 @@ export default {
     },
 
     'exponential': {
-        title: 'exponential',
+        title: 'Exponential',
         description: 'Weight of frames decays exponentially'
     }
 };

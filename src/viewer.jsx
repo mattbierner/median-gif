@@ -79,7 +79,7 @@ class WeightOptions extends React.Component {
     getWeightFunction(state) {
         switch (state.weightMode) {
         case 'exponential':
-            return (i) => this.state.exponentialInitial + Math.exp(-this.state.exponentialScale * i);
+            return (i) => Math.exp(-this.state.exponentialScale * i);
         
         case 'equal':
         default:

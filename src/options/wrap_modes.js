@@ -4,14 +4,18 @@
 export default {
     'overflow': {
         title: 'Overflow',
-        description: 'overflow'
+        description: 'On overflow, go to frame zero'
+    },
+    'mirror': {
+        title: 'Mirror',
+        description: 'Reverse direction when out of bounds'
     },
     'clamp': {
         title: 'Clamp',
-        description: 'clamp'
+        description: 'Clamp samples to bounds'
     },
     'stop': {
         title: 'Stop',
-        description: 'stop'
+        description: 'Stop sampling when out of bounds'
     }
 };

@@ -206,29 +206,40 @@ export default class MedianRenderer {
      * Get the frame and frameWeight of a frame for a given index in the gif.
      */
     getFrame(weightFunction, sampleNumber, index, wrapMode) {
+        const len = this._frames.length;
         let sampleWeight = weightFunction(sampleNumber); 
         let sampleIndex = index;
         switch (wrapMode) {
         case 'clamp':
         {
-            sampleIndex = Math.max(0, Math.min(index, this._frames.length - 1));
+            sampleIndex = Math.max(0, Math.min(index, len - 1));
             break;
         }
 
         case 'stop':
         {
-            if (sampleIndex < 0 || sampleIndex > this._frames.length) {
+            if (sampleIndex < 0 || sampleIndex > len) {
                 return [emptyTexture, 0];
             }
+            break;
+        }
+
+        case 'mirror':
+        {
+            sampleIndex %= len * 2;
+            if (sampleIndex < 0)
+                sampleIndex = len * 2 - 1 - Math.abs(sampleIndex);
+            if (sampleIndex >= len)
+                sampleIndex = len - 1 - (sampleIndex - len);
             break;
         }
 
         case 'overflow':
         default:
         {
-            sampleIndex %= this._frames.length;
+            sampleIndex %= len;
             if (sampleIndex < 0)
-                sampleIndex = this._frames.length - 1 - Math.abs(sampleIndex);
+                sampleIndex = len - 1 - Math.abs(sampleIndex);
             break;
         }
         }

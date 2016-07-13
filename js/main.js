@@ -28589,7 +28589,7 @@
 	            switch (state.weightMode) {
 	                case 'exponential':
 	                    return function (i) {
-	                        return _this5.state.exponentialInitial + Math.exp(-_this5.state.exponentialScale * i);
+	                        return Math.exp(-_this5.state.exponentialScale * i);
 	                    };
 
 	                case 'equal':
@@ -30436,28 +30436,37 @@
 	    }, {
 	        key: 'getFrame',
 	        value: function getFrame(weightFunction, sampleNumber, index, wrapMode) {
+	            var len = this._frames.length;
 	            var sampleWeight = weightFunction(sampleNumber);
 	            var sampleIndex = index;
 	            switch (wrapMode) {
 	                case 'clamp':
 	                    {
-	                        sampleIndex = Math.max(0, Math.min(index, this._frames.length - 1));
+	                        sampleIndex = Math.max(0, Math.min(index, len - 1));
 	                        break;
 	                    }
 
 	                case 'stop':
 	                    {
-	                        if (sampleIndex < 0 || sampleIndex > this._frames.length) {
+	                        if (sampleIndex < 0 || sampleIndex > len) {
 	                            return [emptyTexture, 0];
 	                        }
+	                        break;
+	                    }
+
+	                case 'mirror':
+	                    {
+	                        sampleIndex %= len * 2;
+	                        if (sampleIndex < 0) sampleIndex = len * 2 - 1 - Math.abs(sampleIndex);
+	                        if (sampleIndex >= len) sampleIndex = len - 1 - (sampleIndex - len);
 	                        break;
 	                    }
 
 	                case 'overflow':
 	                default:
 	                    {
-	                        sampleIndex %= this._frames.length;
-	                        if (sampleIndex < 0) sampleIndex = this._frames.length - 1 - Math.abs(sampleIndex);
+	                        sampleIndex %= len;
+	                        if (sampleIndex < 0) sampleIndex = len - 1 - Math.abs(sampleIndex);
 	                        break;
 	                    }
 	            }
@@ -35552,7 +35561,7 @@
 	    },
 
 	    'exponential': {
-	        title: 'exponential',
+	        title: 'Exponential',
 	        description: 'Weight of frames decays exponentially'
 	    }
 	};
@@ -35572,15 +35581,19 @@
 	exports.default = {
 	    'overflow': {
 	        title: 'Overflow',
-	        description: 'overflow'
+	        description: 'On overflow, go to frame zero'
+	    },
+	    'mirror': {
+	        title: 'Mirror',
+	        description: 'Reverse direction when out of bounds'
 	    },
 	    'clamp': {
 	        title: 'Clamp',
-	        description: 'clamp'
+	        description: 'Clamp samples to bounds'
 	    },
 	    'stop': {
 	        title: 'Stop',
-	        description: 'stop'
+	        description: 'Stop sampling when out of bounds'
 	    }
 	};
 
