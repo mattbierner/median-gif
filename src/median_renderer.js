@@ -141,12 +141,12 @@ export default class MedianRenderer {
      * Render for median blending. Renders to a texture.
      */
     renderMedian(options) {
-        const {initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode} = options;
+        const {initialFrame, frameIncrement, sampleMode, numberOfFramesToSample, wrapMode, weightFunction} = options;
         const currentFrame = options.currentFrame + initialFrame;
 
         if (sampleMode === 'bi') {
-            const backwards = this.renderMedianImpl(emptyTexture, 0.5, currentFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode);
-            return this.renderMedianImpl(backwards.texture || backwards, 0.5, currentFrame, frameIncrement, numberOfFramesToSample, wrapMode);
+            const backwards = this.renderMedianImpl(emptyTexture, 0.5, currentFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode, weightFunction);
+            return this.renderMedianImpl(backwards.texture || backwards, 0.5, currentFrame, frameIncrement, numberOfFramesToSample, wrapMode, weightFunction);
         }
         
         return this.renderMedianImpl(
@@ -155,12 +155,19 @@ export default class MedianRenderer {
             currentFrame,
             sampleMode === 'reverse' ? -frameIncrement : frameIncrement,
             numberOfFramesToSample,
-            wrapMode);
+            wrapMode,
+            weightFunction);
     }
 
-    renderMedianImpl(source, mul, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode) {
+    renderMedianImpl(source, mul, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode, weightFunction) {
         let dest = source === this._rtTexture1.texture ? this._rtTexture2 : this._rtTexture1;
 
+        let totalWeight = 0;
+        for (let i = 0; i < numberOfFramesToSample; ++i) {
+            totalWeight += weightFunction(i, numberOfFramesToSample);
+        }
+        const getWeight = (i) => weightFunction(i, numberOfFramesToSample) / totalWeight;
+    
         for (let startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
             const textures = gen_array(median_shader_config.arraySize, emptyTexture);
             const weights = gen_array(median_shader_config.arraySize, 0);
@@ -168,7 +175,7 @@ export default class MedianRenderer {
             for (let i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
                 const sampleNumber  = startFrame + i;
                 const index = initialFrame + (sampleNumber * frameIncrement);
-                const [tex, weight] = this.getFrame(sampleNumber, numberOfFramesToSample, index, wrapMode);
+                const [tex, weight] = this.getFrame(getWeight, sampleNumber, index, wrapMode);
                 textures[i] = tex;
                 weights[i] = weight * mul;
             }
@@ -199,14 +206,8 @@ export default class MedianRenderer {
     /**
      * Get the frame and frameWeight of a frame for a given index in the gif.
      */
-    getFrame(sampleNumber, numberOfFramesToSample, index, wrapMode) {
-        let sum = 0;
-        for (let i = 0; i < numberOfFramesToSample; ++i) {
-            sum += 10 * Math.exp(-0.2 * i);
-        }
-        let mul = 10 * Math.exp(-0.2 * sampleNumber) / sum; 
-
-        let weight = 1;
+    getFrame(weightFunction, sampleNumber, index, wrapMode) {
+        let sampleWeight = weightFunction(sampleNumber); 
         let sampleIndex = index;
         switch (wrapMode) {
         case 'clamp':
@@ -233,6 +234,6 @@ export default class MedianRenderer {
         }
         }
 
-        return [this._frames[sampleIndex], mul * weight];
+        return [this._frames[sampleIndex], sampleWeight];
     }
 }

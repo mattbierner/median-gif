@@ -28500,15 +28500,15 @@
 
 	var _gif_export2 = _interopRequireDefault(_gif_export);
 
-	var _sample_modes = __webpack_require__(226);
+	var _sample_modes = __webpack_require__(225);
 
 	var _sample_modes2 = _interopRequireDefault(_sample_modes);
 
-	var _weight_modes = __webpack_require__(227);
+	var _weight_modes = __webpack_require__(226);
 
 	var _weight_modes2 = _interopRequireDefault(_weight_modes);
 
-	var _wrap_modes = __webpack_require__(225);
+	var _wrap_modes = __webpack_require__(227);
 
 	var _wrap_modes2 = _interopRequireDefault(_wrap_modes);
 
@@ -28542,6 +28542,11 @@
 
 	    return WrapModeSelector;
 	}(_react2.default.Component);
+
+	/**
+	 * 
+	 */
+
 
 	var WeightModeSelector = function (_React$Component2) {
 	    _inherits(WeightModeSelector, _React$Component2);
@@ -28587,19 +28592,123 @@
 	}(_react2.default.Component);
 
 	/**
+	 * 
+	 */
+
+
+	var WeightOptions = function (_React$Component4) {
+	    _inherits(WeightOptions, _React$Component4);
+
+	    function WeightOptions(props) {
+	        _classCallCheck(this, WeightOptions);
+
+	        var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(WeightOptions).call(this, props));
+
+	        _this4.state = {
+	            weightMode: Object.keys(_weight_modes2.default)[0],
+
+	            // exponential
+	            exponentialInitial: '1',
+	            exponentialScale: '0.1'
+	        };
+	        return _this4;
+	    }
+
+	    _createClass(WeightOptions, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.onUpdate(this.state);
+	        }
+	    }, {
+	        key: 'onWeightModeChange',
+	        value: function onWeightModeChange(e) {
+	            var value = e.target.value;
+	            var update = { weightMode: value };
+	            this.setState(update);
+	            this.onUpdate(Object.assign({}, this.state, update));
+	        }
+	    }, {
+	        key: 'onUpdate',
+	        value: function onUpdate(state) {
+	            var fn = this.getWeightFunction(state);
+	            this.props.onWeightFunctionChange(fn);
+	        }
+	    }, {
+	        key: 'getWeightFunction',
+	        value: function getWeightFunction(state) {
+	            var _this5 = this;
+
+	            switch (state.weightMode) {
+	                case 'exponential':
+	                    return function (i) {
+	                        return _this5.state.exponentialInitial + Math.exp(-_this5.state.exponentialScale * i);
+	                    };
+
+	                case 'equal':
+	                default:
+	                    return function () {
+	                        return 1;
+	                    };
+	            }
+	        }
+	    }, {
+	        key: 'onExponentialScaleChange',
+	        value: function onExponentialScaleChange(e) {
+	            var value = e.target.value;
+	            if (isNaN(value)) {
+	                this.setState({ exponentialScale: value });
+	                return;
+	            }
+	            var update = { exponentialScale: value };
+	            this.setState(update);
+	            this.onUpdate(Object.assign({}, this.state, update));
+	        }
+	    }, {
+	        key: 'onExponentialInitialChange',
+	        value: function onExponentialInitialChange(e) {
+	            var value = e.target.value;
+	            if (isNaN(value)) {
+	                this.setState({ exponentialInitial: value });
+	                return;
+	            }
+	            var update = { exponentialInitial: value };
+	            this.setState(update);
+	            this.onUpdate(Object.assign({}, this.state, update));
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'frame-controls' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'full-width' },
+	                    _react2.default.createElement(WeightModeSelector, { value: this.state.weightMode, onChange: this.onWeightModeChange.bind(this) })
+	                ),
+	                _react2.default.createElement('input', { type: 'number', step: '0.01', value: this.state.exponentialInitial, onChange: this.onExponentialInitialChange.bind(this) }),
+	                _react2.default.createElement('input', { type: 'number', step: '0.01', value: this.state.exponentialScale, onChange: this.onExponentialScaleChange.bind(this) })
+	            );
+	        }
+	    }]);
+
+	    return WeightOptions;
+	}(_react2.default.Component);
+
+	/**
 	 * Displays an interative scanlined gif with controls. 
 	 */
 
 
-	var Viewer = function (_React$Component4) {
-	    _inherits(Viewer, _React$Component4);
+	var Viewer = function (_React$Component5) {
+	    _inherits(Viewer, _React$Component5);
 
 	    function Viewer(props) {
 	        _classCallCheck(this, Viewer);
 
-	        var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(Viewer).call(this, props));
+	        var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(Viewer).call(this, props));
 
-	        _this4.state = {
+	        _this6.state = {
 	            imageData: null,
 	            loadingGif: false,
 	            exporting: false,
@@ -28615,7 +28724,7 @@
 	            numberOfFramesToSample: 1,
 	            weightMode: Object.keys(_weight_modes2.default)[0]
 	        };
-	        return _this4;
+	        return _this6;
 	    }
 
 	    _createClass(Viewer, [{
@@ -28633,13 +28742,13 @@
 	    }, {
 	        key: 'loadGif',
 	        value: function loadGif(file) {
-	            var _this5 = this;
+	            var _this7 = this;
 
 	            this.setState({ loadingGif: true });
 	            (0, _loadGif3.default)(file).then(function (data) {
-	                if (file !== _this5.props.file) return;
+	                if (file !== _this7.props.file) return;
 
-	                _this5.setState({
+	                _this7.setState({
 	                    imageData: data,
 	                    loadingGif: false,
 	                    error: null,
@@ -28652,10 +28761,10 @@
 	                    numberOfFramesToSample: Math.ceil(data.frames.length / 2)
 	                });
 	            }).catch(function (e) {
-	                if (file !== _this5.props.file) return;
+	                if (file !== _this7.props.file) return;
 
 	                console.error(e);
-	                _this5.setState({
+	                _this7.setState({
 	                    imageData: [],
 	                    loadingGif: false,
 	                    error: 'Could not load gif'
@@ -28675,22 +28784,10 @@
 	            this.setState({ frameIncrement: value });
 	        }
 	    }, {
-	        key: 'onInitialFrameChange',
-	        value: function onInitialFrameChange(e) {
-	            var value = +e.target.value;
-	            this.setState({ initialFrame: value });
-	        }
-	    }, {
 	        key: 'onNumberOfFramesToSampleChanged',
 	        value: function onNumberOfFramesToSampleChanged(e) {
 	            var value = +e.target.value;
 	            this.setState({ numberOfFramesToSample: value });
-	        }
-	    }, {
-	        key: 'onWeightModeChange',
-	        value: function onWeightModeChange(e) {
-	            var value = e.target.value;
-	            this.setState({ weightMode: value });
 	        }
 	    }, {
 	        key: 'onSampleModeChange',
@@ -28701,13 +28798,13 @@
 	    }, {
 	        key: 'onExport',
 	        value: function onExport() {
-	            var _this6 = this;
+	            var _this8 = this;
 
 	            if (!this._renderer) return;
 
 	            this.setState({ exporting: true });
 	            (0, _gif_export2.default)(this.state.imageData, this._renderer, this.state).then(function (blob) {
-	                _this6.setState({ exporting: false });
+	                _this8.setState({ exporting: false });
 	                var url = URL.createObjectURL(blob);
 	                window.open(url);
 	            });
@@ -28716,6 +28813,11 @@
 	        key: 'onRendererLoaded',
 	        value: function onRendererLoaded(renderer) {
 	            this._renderer = renderer;
+	        }
+	    }, {
+	        key: 'onWeightFunctionChange',
+	        value: function onWeightFunctionChange(weightFunction) {
+	            this.setState({ weightFunction: weightFunction });
 	        }
 	    }, {
 	        key: 'render',
@@ -28747,34 +28849,17 @@
 	                                max: this.state.imageData ? this.state.imageData.frames.length : 0,
 	                                value: this.state.numberOfFramesToSample,
 	                                onChange: this.onNumberOfFramesToSampleChanged.bind(this) })
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'full-width' },
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Frame Increment',
-	                                min: '1',
-	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
-	                                value: this.state.frameIncrement,
-	                                onChange: this.onFrameIncrementChange.bind(this) })
 	                        )
 	                    ),
+	                    _react2.default.createElement(WeightOptions, { onWeightFunctionChange: this.onWeightFunctionChange.bind(this) }),
 	                    _react2.default.createElement(
 	                        'div',
-	                        { className: 'frame-controls' },
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'full-width' },
-	                            _react2.default.createElement(WeightModeSelector, { value: this.state.weightMode, onChange: this.onWeightModeChange.bind(this) })
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'full-width' },
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Initial Frame',
-	                                min: '0',
-	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
-	                                value: this.state.initialFrame,
-	                                onChange: this.onInitialFrameChange.bind(this) })
-	                        )
+	                        { className: 'full-width' },
+	                        _react2.default.createElement(_labeled_slider2.default, { title: 'Frame Increment',
+	                            min: '1',
+	                            max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
+	                            value: this.state.frameIncrement,
+	                            onChange: this.onFrameIncrementChange.bind(this) })
 	                    ),
 	                    _react2.default.createElement(
 	                        'div',
@@ -28783,15 +28868,6 @@
 	                            'div',
 	                            { className: 'full-width' },
 	                            _react2.default.createElement(WrapModeSelector, { value: this.state.wrapMode, onChange: this.onWrapModeChange.bind(this) })
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'full-width' },
-	                            _react2.default.createElement(_labeled_slider2.default, { title: 'Initial Frame',
-	                                min: '0',
-	                                max: this.state.imageData ? this.state.imageData.frames.length - 1 : 0,
-	                                value: this.state.initialFrame,
-	                                onChange: this.onInitialFrameChange.bind(this) })
 	                        )
 	                    ),
 	                    _react2.default.createElement(
@@ -30501,38 +30577,47 @@
 	            var sampleMode = options.sampleMode;
 	            var numberOfFramesToSample = options.numberOfFramesToSample;
 	            var wrapMode = options.wrapMode;
+	            var weightFunction = options.weightFunction;
 
 	            var currentFrame = options.currentFrame + initialFrame;
 
 	            if (sampleMode === 'bi') {
-	                var backwards = this.renderMedianImpl(emptyTexture, 0.5, currentFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode);
-	                return this.renderMedianImpl(backwards.texture || backwards, 0.5, currentFrame, frameIncrement, numberOfFramesToSample, wrapMode);
+	                var backwards = this.renderMedianImpl(emptyTexture, 0.5, currentFrame - 1, -frameIncrement, numberOfFramesToSample, wrapMode, weightFunction);
+	                return this.renderMedianImpl(backwards.texture || backwards, 0.5, currentFrame, frameIncrement, numberOfFramesToSample, wrapMode, weightFunction);
 	            }
 
-	            return this.renderMedianImpl(emptyTexture, 1, currentFrame, sampleMode === 'reverse' ? -frameIncrement : frameIncrement, numberOfFramesToSample, wrapMode);
+	            return this.renderMedianImpl(emptyTexture, 1, currentFrame, sampleMode === 'reverse' ? -frameIncrement : frameIncrement, numberOfFramesToSample, wrapMode, weightFunction);
 	        }
 	    }, {
 	        key: 'renderMedianImpl',
-	        value: function renderMedianImpl(source, mul, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode) {
+	        value: function renderMedianImpl(source, mul, initialFrame, frameIncrement, numberOfFramesToSample, wrapMode, weightFunction) {
 	            var dest = source === this._rtTexture1.texture ? this._rtTexture2 : this._rtTexture1;
+
+	            var totalWeight = 0;
+	            for (var i = 0; i < numberOfFramesToSample; ++i) {
+	                totalWeight += weightFunction(i, numberOfFramesToSample);
+	            }
+	            var getWeight = function getWeight(i) {
+	                return weightFunction(i, numberOfFramesToSample) / totalWeight;
+	            };
 
 	            for (var startFrame = 0; startFrame < numberOfFramesToSample; startFrame += median_shader_config.arraySize) {
 	                var textures = (0, _gen_array2.default)(median_shader_config.arraySize, emptyTexture);
 	                var weights = (0, _gen_array2.default)(median_shader_config.arraySize, 0);
 
-	                for (var i = 0; i < median_shader_config.arraySize && startFrame + i < numberOfFramesToSample; ++i) {
-	                    var sampleNumber = startFrame + i;
+	                for (var _i = 0; _i < median_shader_config.arraySize && startFrame + _i < numberOfFramesToSample; ++_i) {
+	                    var sampleNumber = startFrame + _i;
 	                    var index = initialFrame + sampleNumber * frameIncrement;
 
-	                    var _getFrame = this.getFrame(sampleNumber, numberOfFramesToSample, index, wrapMode);
+	                    var _getFrame = this.getFrame(getWeight, sampleNumber, index, wrapMode);
 
 	                    var _getFrame2 = _slicedToArray(_getFrame, 2);
 
 	                    var tex = _getFrame2[0];
 	                    var weight = _getFrame2[1];
 
-	                    textures[i] = tex;
-	                    weights[i] = weight * mul;
+	                    textures[_i] = tex;
+	                    weights[_i] = weight * mul;
 	                }
 
 	                source = this.renderGifFrames(textures, weights, source, dest);
@@ -30567,14 +30652,8 @@
 
 	    }, {
 	        key: 'getFrame',
-	        value: function getFrame(sampleNumber, numberOfFramesToSample, index, wrapMode) {
-	            var sum = 0;
-	            for (var i = 0; i < numberOfFramesToSample; ++i) {
-	                sum += 10 * Math.exp(-0.2 * i);
-	            }
-	            var mul = 10 * Math.exp(-0.2 * sampleNumber) / sum;
-
-	            var weight = 1;
+	        value: function getFrame(weightFunction, sampleNumber, index, wrapMode) {
+	            var sampleWeight = weightFunction(sampleNumber);
 	            var sampleIndex = index;
 	            switch (wrapMode) {
 	                case 'clamp':
@@ -30600,7 +30679,7 @@
 	                    }
 	            }
 
-	            return [this._frames[sampleIndex], mul * weight];
+	            return [this._frames[sampleIndex], sampleWeight];
 	        }
 	    }]);
 
@@ -35642,33 +35721,6 @@
 	    value: true
 	});
 	/**
-	 * Wrapping mode for frame selections.
-	 */
-	exports.default = {
-	    'overflow': {
-	        title: 'Overflow',
-	        description: 'overflow'
-	    },
-	    'clamp': {
-	        title: 'Clamp',
-	        description: 'clamp'
-	    },
-	    'stop': {
-	        title: 'Stop',
-	        description: 'stop'
-	    }
-	};
-
-/***/ },
-/* 226 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	/**
 	 * Wrapping mode for frame selections
 	 */
 	exports.default = {
@@ -35687,7 +35739,7 @@
 	};
 
 /***/ },
-/* 227 */
+/* 226 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -35701,7 +35753,39 @@
 	exports.default = {
 	    'equal': {
 	        title: 'Equal',
-	        description: 'equal'
+	        description: 'Every frame has equal weight'
+	    },
+
+	    'exponential': {
+	        title: 'exponential',
+	        description: 'Weight of frames decays exponentially'
+	    }
+	};
+
+/***/ },
+/* 227 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 * Wrapping mode for frame selections.
+	 */
+	exports.default = {
+	    'overflow': {
+	        title: 'Overflow',
+	        description: 'overflow'
+	    },
+	    'clamp': {
+	        title: 'Clamp',
+	        description: 'clamp'
+	    },
+	    'stop': {
+	        title: 'Stop',
+	        description: 'stop'
 	    }
 	};
 

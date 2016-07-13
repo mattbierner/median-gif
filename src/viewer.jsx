@@ -23,6 +23,9 @@ class WrapModeSelector extends React.Component {
     }
 }
 
+/**
+ * 
+ */
 class WeightModeSelector extends React.Component {
     render() {
         return (
@@ -31,7 +34,6 @@ class WeightModeSelector extends React.Component {
     }
 }
 
-
 /**
  * Control for selecting frame selection mode.
  */
@@ -39,6 +41,85 @@ class SampleModeSelector extends React.Component {
     render() {
         return (
             <LabeledSelector {...this.props} title="Sample Mode" options={sampleModes} />
+        );
+    }
+}
+
+/**
+ * 
+ */
+class WeightOptions extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            weightMode: Object.keys(weightModes)[0],
+
+            // exponential
+            exponentialInitial: '1',
+            exponentialScale: '0.1'
+        };
+    }
+
+    componentDidMount() {
+        this.onUpdate(this.state);
+    }
+
+    onWeightModeChange(e) {
+        const value = e.target.value;
+        const update = { weightMode: value };
+        this.setState(update);
+        this.onUpdate(Object.assign({}, this.state,update));
+    }
+
+    onUpdate(state) {
+        const fn = this.getWeightFunction(state);
+        this.props.onWeightFunctionChange(fn);
+    }
+
+    getWeightFunction(state) {
+        switch (state.weightMode) {
+        case 'exponential':
+            return (i) => this.state.exponentialInitial + Math.exp(-this.state.exponentialScale * i);
+        
+        case 'equal':
+        default:
+            return () => 1;
+        }
+    }
+
+    onExponentialScaleChange(e) {
+        const value = e.target.value;
+        if (isNaN(value)) {
+            this.setState({exponentialScale: value });
+            return;
+        }
+        const update = { exponentialScale: value }
+        this.setState(update);
+        this.onUpdate(Object.assign({}, this.state, update));
+    }
+
+    onExponentialInitialChange(e) {
+        const value = e.target.value;
+        if (isNaN(value)) {
+            this.setState({exponentialInitial: value });
+            return;
+        }
+        const update = { exponentialInitial: value }
+        this.setState(update);
+        this.onUpdate(Object.assign({}, this.state, update));
+    }
+
+    render() {
+        return (
+            <div className="frame-controls">
+                <div className="full-width">
+                    <WeightModeSelector value={this.state.weightMode} onChange={this.onWeightModeChange.bind(this) } />
+                </div>
+
+                <input type="number" step="0.01" value={this.state.exponentialInitial} onChange={this.onExponentialInitialChange.bind(this)}/>
+
+                <input type="number" step="0.01" value={this.state.exponentialScale} onChange={this.onExponentialScaleChange.bind(this)}/>
+            </div>
         );
     }
 }
@@ -120,19 +201,9 @@ export default class Viewer extends React.Component {
         this.setState({ frameIncrement: value });
     }
 
-    onInitialFrameChange(e) {
-        const value = +e.target.value;
-        this.setState({ initialFrame: value });
-    }
-
     onNumberOfFramesToSampleChanged(e) {
         const value = +e.target.value;
         this.setState({ numberOfFramesToSample: value });
-    }
-
-    onWeightModeChange(e) {
-        const value = e.target.value;
-        this.setState({ weightMode: value });
     }
 
     onSampleModeChange(e) {
@@ -156,6 +227,10 @@ export default class Viewer extends React.Component {
         this._renderer = renderer;
     }
 
+    onWeightFunctionChange(weightFunction) {
+        this.setState({ weightFunction: weightFunction });
+    }
+
     render() {
         return (
             <div className="gif-viewer" id="viewer">
@@ -175,39 +250,23 @@ export default class Viewer extends React.Component {
                                 value={this.state.numberOfFramesToSample}
                                 onChange={this.onNumberOfFramesToSampleChanged.bind(this) }/>
                         </div>
-                        <div className="full-width">
-                            <LabeledSlider title='Frame Increment'
-                                min="1"
-                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
-                                value={this.state.frameIncrement}
-                                onChange={this.onFrameIncrementChange.bind(this) }/>
-                        </div>
                     </div>
 
-                    <div className="frame-controls">
-                        <div className="full-width">
-                            <WeightModeSelector value={this.state.weightMode} onChange={this.onWeightModeChange.bind(this) } />
-                        </div>
-                        <div className="full-width">
-                            <LabeledSlider title='Initial Frame'
-                                min="0"
-                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
-                                value={this.state.initialFrame}
-                                onChange={this.onInitialFrameChange.bind(this) }/>
-                        </div>
+                    <WeightOptions onWeightFunctionChange={this.onWeightFunctionChange.bind(this) } />
+
+                     <div className="full-width">
+                        <LabeledSlider title='Frame Increment'
+                            min="1"
+                            max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
+                            value={this.state.frameIncrement}
+                            onChange={this.onFrameIncrementChange.bind(this) }/>
                     </div>
 
                     <div className="frame-controls">
                         <div className="full-width">
                             <WrapModeSelector value={this.state.wrapMode} onChange={this.onWrapModeChange.bind(this) } />
                         </div>
-                        <div className="full-width">
-                            <LabeledSlider title='Initial Frame'
-                                min="0"
-                                max={this.state.imageData ? this.state.imageData.frames.length - 1 : 0}
-                                value={this.state.initialFrame}
-                                onChange={this.onInitialFrameChange.bind(this) }/>
-                        </div>
+
                     </div>
 
                     <div className="export-controls">
