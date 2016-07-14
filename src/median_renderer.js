@@ -240,7 +240,7 @@ export default class MedianRenderer {
         {
             sampleIndex %= len;
             if (sampleIndex < 0)
-                sampleIndex = len - 1 - Math.abs(sampleIndex);
+                sampleIndex = (len - Math.abs(sampleIndex)) % len;
             break;
         }
         }

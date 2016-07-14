@@ -30466,7 +30466,7 @@
 	                default:
 	                    {
 	                        sampleIndex %= len;
-	                        if (sampleIndex < 0) sampleIndex = len - 1 - Math.abs(sampleIndex);
+	                        if (sampleIndex < 0) sampleIndex = (len - Math.abs(sampleIndex)) % len;
 	                        break;
 	                    }
 	            }
