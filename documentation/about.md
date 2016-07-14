@@ -48,7 +48,7 @@ Controls how frames outside the range of the original animation. Consider a gif 
 ![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/example.gif)
 
 
-**Mirror** - When the start of end of the animation is hit, reverse direction and start going the opposite way: `2 -> 2`, `5 -> 2`, `-1 -> 1`
+**Mirror** - When the start or end of the animation is reached, reverse direction and start counting in reverse: `2 -> 2`, `5 -> 2`, `-1 -> 1`
 
 ![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/mirror.gif)
 
