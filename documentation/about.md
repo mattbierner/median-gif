@@ -20,7 +20,7 @@ Controls the direction of sampling for blending.
 
 **Reverse** - Samples frames before the current frame to produce the new image.
 
-![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/revese.gif)
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/reverse.gif)
 
 
 **Bidirectional** - Combines forward and reverse (and samples twice as many frames.)
@@ -35,9 +35,9 @@ Sample size of 5:
 
 ![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/sample-5.gif)
 
-Sample all frames
+Sample all frames:
 
-![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/sample-all.gif)
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/sample-all.png)
 
 
 ### Wrapping
