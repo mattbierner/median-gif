@@ -11,7 +11,7 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedGif: "http://media3.giphy.com/media/3oxRmD9a5pLTOOLigM/giphy.gif"
+            selectedGif: "./images/example.gif"
         };
     }
 
