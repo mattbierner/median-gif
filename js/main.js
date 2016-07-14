@@ -35530,15 +35530,15 @@
 	exports.default = {
 	    'forward': {
 	        title: 'Forwards',
-	        description: 'Select frames after the current frame'
+	        description: 'Sample frames after the current frame'
 	    },
 	    'reverse': {
 	        title: 'Reverse',
-	        description: 'Select frames before the current frame'
+	        description: 'Sample frames before the current frame'
 	    },
 	    'bi': {
-	        title: 'Bi-Directional',
-	        description: 'Select frames both before and after the current frame'
+	        title: 'Bidirectional',
+	        description: 'Sample frames both before and after the current frame'
 	    }
 	};
 

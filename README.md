@@ -1,15 +1,17 @@
 # WIP
 
 <div align="center">
-    <div><img src="https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/cat.gif" /></div>
+    <div><img src="https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/example.gif" /></div>
     <h1 align="center">median.gif</h1>
     <p><i align="center">Median blending gifs</i></p>
 </div>
 
 
+*[median.gif](site)* is an experiment [median blending](http://petapixel.com/2013/05/29/a-look-at-reducing-noise-in-photographs-using-median-blending/) multiple frames of gif animation together. When all frames of the animation are blended together, the result is a single image the captures to average value of each pixel across the entire animation. You can also create animations by only blending a subset of frames or changing how the blending works.
+
+
 * [Site][site]
 * [Documentation][documentation]
-
 
 
 ## Building and Running

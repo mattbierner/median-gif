@@ -1,95 +1,89 @@
-# About *scanline.gif*
+# About *median.gif*
 
-*[scanline.gif](site)* is an experiment flattening gifs so that multiple frames of animation are rendered in a single image. The effect is kind of like [slit-scan photography](https://en.wikipedia.org/wiki/Slit-scan_photography).
-
-This page overviews the concept, and details how you can customize the rendering.
-
-# Concept
-The original idea behind *scanline.gif* was to explore rendering an animated gif as a single (non-animated) image. Basically: wouldn't it be interesting to re-encoding the time aspect of the animation back into a single image?
-
-*scanline.gif* accomplishes this by rendering multiple frames of the original animation at the same time onto a single image. But only a slice of each frame is rendered, so one part of the image may be showing the second frame while another could be showing frame 7. It's easier to show than explain.
-
-Take a 13 frame gif where each frame is a solid color, starting with red at frame 1 and fading to blue at frame 13.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-start.gif)
-
-Now slice the gif into 13 equal width columns. Draw each column of the image individually, but also advance the animation one frame between columns. You end up with a single image that captures every frame of the original animation.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example.png)
-
-These single images can be pretty cool but, for even more fun, you can then replay the animation. Here's what that looks like:
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-columns.gif)
-
-Besides basic columns, *scanline.gif* provides a few different modes for placing the scanlines. There's also a few other options to play around with. Try mixing settings to produce some interesting effects.
-
+*[median.gif](site)* is an experiment [median blending](http://petapixel.com/2013/05/29/a-look-at-reducing-noise-in-photographs-using-median-blending/) multiple frames of gif animation together. When all frames of the animation are blended together, the result is a single image the captures to average value of each pixel across the entire animation. You can also create animations by only blending a subset of frames or changing how the blending works.
 
 ## Basic Settings
-
 
 ### Gif
 Gifs come from Giphy. Just enter a search term and select one of the returned gifs.
 
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/search.gif)
+We'll use this gif for these examples:
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/original.gif)
+
+### Sample Direction
+Controls the direction of sampling for blending. Forward means that frames after the current frame are sampled to produce the new frame, while reverse means that frames before the current frame are sampled. Bidirectional combines forward and reverse (and samples twice as many frames.)
+
+Forward:
+
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/example.gif)
+
+
+Reverse:
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/revese.gif)
+
+Bidirectional
+
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/bidirectional.gif)
+
+
+### Sample Frames
+Number of frames to sample. A sample size of 1 produces the original gif, while a sample size equal to the number of frames blends all frames in the gif.
+
+Sample size of 5:
+
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/sample-5.gif)
+
+Sample all frames
+
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/sample-all.gif)
+
+
+### Wrapping
+Controls how frames outside the range of the original animation. Consider a gif with 4 frames: 0, 1, 2, and 3
+
+**Overflow** - Uses a mod operator to wrap frame results: `2 -> 2`, `5 -> 1`, `-1 -> 3`
+
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/example.gif)
+
+
+**Mirror** - When the start of end of the animation is hit, reverse direction and start going the opposite way: `2 -> 2`, `5 -> 2`, `-1 -> 1`
+
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/mirror.gif)
+
+
+**Clamp** - Clamp frames to animation range: `2 -> 2`, `5 -> 3`, `-1 -> 0`
+
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/clamp.gif)
+
+
+**Stop** - Replace frames outside of animation range with black: `2 -> 2`, `5 -> nothing`, `-1 -> nothing`
+
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/stop.gif)
+
 
 ### Frame Increment
-Number of frames to skip ahead for each scan-line. In the column example, this is the number of frames between two columns.
+When sampling, how many frames should be advanced between each sample. `1` skips ahead a single frame while `4` skips ahead four frames each time.
 
-Frame increment of 2
+Frame Increment 1:
 
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-columns-inc2.gif)
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/example.gif)
 
-Frame increment of 6.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-columns-inc6.gif)
-
-
-### Reverse Frames
-Reverses the frame increment so that frames are sampled in backwards order.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-columns-reverse.gif)
+Frame Increment 4
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/increment-4.gif)
 
 
-### Mirror Frames
-When iterating through the frames, when the last frame is reached, instead of overflowing to 0, reverse increment order and go back to zero.
+### Frame Weights
+Controls the blending weight of each frame
 
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-columns-mirror.gif)
+**Equal** - Every frame contributes equally to final image.
 
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/example.gif)
 
-## Modes
+**Exponential** - Frame weights decay exponentially. 
 
-### Columns
-Renders equal width columns, one for each frame of the animation.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-columns.gif)
-
-### Rows
-Renders equal height rows, one for each frame of the animation.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-rows.gif)
-
-### Grid
-Customizable version of *columns*/*rows*. Renders frames in a grid pattern.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-grid-10x10.gif)
-
-* Columns - Number of columns to divide the image into.
-* Rows - Number of rows to divide the image into.
+![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/exponential-5.gif)
 
 
-### Diagonal
-Renders frames as rotated bars.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-diag.gif)
-
-* Angle - Angle of rotation.
-* Step Size - Size of each bar in pixels.
 
 
-### Rings
-Renders frames as rings emanating from the center of the image.
-
-![](https://raw.githubusercontent.com/mattbierner/scanline-gif/gh-pages/documentation/images/rb-example-rings.gif)
-
-* Angle - Angle of rotation.
-* Step Size - Size of each ring in pixels.
+[site]: https://mattbierner.github.io/median-gif/
