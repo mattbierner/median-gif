@@ -1,6 +1,6 @@
 # About *median.gif*
 
-*[median.gif](site)* is an experiment [median blending](http://petapixel.com/2013/05/29/a-look-at-reducing-noise-in-photographs-using-median-blending/) multiple frames of gif animation together. When all frames of the animation are blended together, the result is a single image the captures to average value of each pixel across the entire animation. You can also create animations by only blending a subset of frames or changing how the blending works.
+*[median.gif](site)* is an experiment [median blending](http://petapixel.com/2013/05/29/a-look-at-reducing-noise-in-photographs-using-median-blending/) multiple frames of gif animations together. When all frames of the animation are blended together, the result is a single image the captures to average value of each pixel across the entire animation. You can also create new animations by only blending a subset of frames or changing how the blending works.
 
 ## Basic Settings
 
@@ -11,23 +11,25 @@ We'll use this gif for these examples:
 ![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/original.gif)
 
 ### Sample Direction
-Controls the direction of sampling for blending. Forward means that frames after the current frame are sampled to produce the new frame, while reverse means that frames before the current frame are sampled. Bidirectional combines forward and reverse (and samples twice as many frames.)
+Controls the direction of sampling for blending. 
 
-Forward:
+**Forward** - Samples frames after the current frame to produce the new image.
 
 ![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/example.gif)
 
 
-Reverse:
+**Reverse** - Samples frames before the current frame to produce the new image.
+
 ![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/revese.gif)
 
-Bidirectional
+
+**Bidirectional** - Combines forward and reverse (and samples twice as many frames.)
 
 ![](https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/bidirectional.gif)
 
 
 ### Sample Frames
-Number of frames to sample. A sample size of 1 produces the original gif, while a sample size equal to the number of frames blends all frames in the gif.
+Number of frames to sample. A sample size of 1 produces the original gif (since only the current frame is sampled), while a sample size equal to the number of frames in the animation blends all frames together.
 
 Sample size of 5:
 
