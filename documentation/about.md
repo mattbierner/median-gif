@@ -41,7 +41,7 @@ Sample all frames:
 
 
 ### Wrapping
-Controls how frames outside the range of the original animation. Consider a gif with 4 frames: 0, 1, 2, and 3
+Controls how frames outside the range of the original animation are sampled. Consider a gif with 4 frames: 0, 1, 2, and 3
 
 **Overflow** - Uses a mod operator to wrap frame results: `2 -> 2`, `5 -> 1`, `-1 -> 3`
 
