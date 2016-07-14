@@ -1,5 +1,5 @@
 <div align="center">
-    <div><img src="https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/images/example.gif" /></div>
+    <div><img src="https://raw.githubusercontent.com/mattbierner/median-gif/gh-pages/documentation/main.gif" /></div>
     <h1 align="center">median.gif</h1>
     <p><i align="center">Median blending gifs</i></p>
 </div>
