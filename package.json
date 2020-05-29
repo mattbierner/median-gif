@@ -14,6 +14,11 @@
     "url": "https://github.com/mattbierner/median-gif/issues"
   },
   "homepage": "https://mattbierner.github.io/median-gif",
+  "scripts": {
+    "build": "webpack",
+    "build:prod": "webpack --env.production",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
+  },
   "devDependencies": {
     "babel": "^5.6.23",
     "babel-core": "^6.8.0",
@@ -27,8 +32,8 @@
   "dependencies": {
     "chroma-js": "^1.1.1",
     "gif-encoder": "^0.4.1",
-    "giphy-api": "^1.1.16",
-    "omggif": "^1.0.8",
+    "giphy-api": "^2.0.0",
+    "omggif": "^1.0.10",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
     "three": "^0.78.0"
