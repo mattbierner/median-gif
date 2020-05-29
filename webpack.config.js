@@ -23,6 +23,7 @@ module.exports = (env, argv) => {
         },
         output: {
             filename: "[name].js",
+            publicPath: 'js/',
             path: path.join(__dirname, "js")
         },
         devtool: production ? '' : 'inline-source-map',

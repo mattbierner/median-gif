@@ -1,35 +1,32 @@
-const GifEncoder = require('gif-encoder');
 import MedianRenderer from './median_renderer';
+import { hex } from 'chroma-js';
 
 /**
- * Exprt
+ * Export
  */
-export default (imageData, sourceRenderer, props) => {
-    const gif = new GifEncoder(imageData.width, imageData.height);
+export default function (imageData, sourceRenderer, props) {
+    return import('./gifencoder.js').then(({ GifEncoder }) => {
+        const canvas = document.createElement("canvas");
+        const renderer = new MedianRenderer(canvas);
+        renderer.clone(sourceRenderer);
 
-    const canvas = document.createElement("canvas");
-    const renderer = new MedianRenderer(canvas);
-    renderer.clone(sourceRenderer);
+        const width = imageData.width;
+        const height = imageData.height;
+        
+        return new Promise((resolve) => {
+            const encoder = new GifEncoder({ width, height });
 
-    const p = new Promise((resolve) => {
-        const parts = [];
-        gif.on('data', data => parts.push(data));
-        gif.on('end', () => {
-            const blob = new Blob(parts, { type: 'image/gif' });
-            resolve(blob);
+            encoder.once('finished', (blob) => {
+                resolve(blob);
+            });
+
+            for (let i = 0; i < imageData.frames.length; ++i) {
+                renderer.setOptions(Object.assign({ currentFrame: i }, props));
+                const delay = imageData.frames[i].info.delay * 10;
+                encoder.addFrame(new ImageData(new Uint8ClampedArray(renderer.renderToBuffer()), width, height), delay);
+            }
+
+            encoder.render();
         });
     });
-
-    gif.setRepeat(0); // infinite loop
-    gif.writeHeader();
-
-    setTimeout(() => {
-        for (let i = 0; i < imageData.frames.length; ++i) {
-            renderer.setOptions(Object.assign({ currentFrame: i }, props));
-            gif.setDelay(imageData.frames[i].info.delay * 10);
-            gif.addFrame(renderer.renderToBuffer());
-        }
-        gif.finish();
-    }, 0);
-    return p;
 };

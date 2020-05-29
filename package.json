@@ -31,7 +31,6 @@
   },
   "dependencies": {
     "chroma-js": "^1.1.1",
-    "gif-encoder": "^0.4.1",
     "giphy-api": "^2.0.0",
     "omggif": "^1.0.10",
     "react": "^15.1.0",

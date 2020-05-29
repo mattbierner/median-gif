@@ -210,6 +210,7 @@ export default class Viewer extends React.Component {
             this.setState({ exporting: false });
             const url = URL.createObjectURL(blob);
             window.open(url);
+            URL.revokeObjectURL(url);
         });
     }
 
