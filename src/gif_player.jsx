@@ -113,19 +113,20 @@ export default class GifPlayer extends React.Component {
             if (!this.props.imageData || this.props.imageData !== imageData)
                 return;
 
-            let nextFrame = (this.state.currentFrame + 1);
-            if (nextFrame >= this.getNumFrames() && !this.state.loop) {
+            let nextFrameIndex = (this.state.currentFrame + 1);
+            if (nextFrameIndex >= this.getNumFrames() && !this.state.loop) {
                 this.setState({ playing: false });
                 return;
             }
 
-            nextFrame %= this.getNumFrames();
+            nextFrameIndex %= this.getNumFrames();
 
-            const interval = ((this.props.imageData.frames[nextFrame].info.delay || 1) * 10) / this.state.playbackSpeed;
+            const nextFrame = this.props.imageData.frames[nextFrameIndex];
+            const interval = ((nextFrame.info.delay || 3) * 10) / this.state.playbackSpeed;
             const elapsed = (Date.now() - start);
             const next = Math.max(0, interval - (elapsed - delay));
             this.setState({
-                currentFrame: nextFrame
+                currentFrame: nextFrameIndex
             });
             this.scheduleNextFrame(imageData, next);
         }, delay);

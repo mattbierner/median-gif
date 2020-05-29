@@ -24,10 +24,10 @@ Start Jekyll with:
 $ jekyll serve -w
 ```
 
-Start webpack with:
+Build the JS with:
 
 ```bash
-$ webpack --watch
+$ npm run build
 ```
 
 Main Javascript is stored in `src` and output to `js`.

@@ -16,8 +16,7 @@
   "homepage": "https://mattbierner.github.io/median-gif",
   "scripts": {
     "build": "webpack",
-    "build:prod": "webpack --env.production",
-    "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
+    "build:prod": "webpack --env.production"
   },
   "devDependencies": {
     "@babel/core": "^7.10.1",
